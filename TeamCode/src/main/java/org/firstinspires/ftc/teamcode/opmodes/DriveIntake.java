@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
@@ -15,7 +16,8 @@ public class DriveIntake extends LinearOpMode {
         DcMotor backLeftMotor = hardwareMap.dcMotor.get("motorBL");
         DcMotor frontRightMotor = hardwareMap.dcMotor.get("motorFR");
         DcMotor backRightMotor = hardwareMap.dcMotor.get("motorBR");
-        DcMotor intakeMotor = hardwareMap.dcMotor.get("motorI");
+        DcMotorEx intakeMotor = hardwareMap.get(DcMotorEx.class, "motorI");
+        intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // Reverse the right side motors. This may be wrong for your setup.
         // If your robot moves backwards when commanded to go forwards,
         // reverse the left side instead.
@@ -23,6 +25,8 @@ public class DriveIntake extends LinearOpMode {
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        telemetry.addData("Velocity PID",intakeMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER));
+        telemetry.update();
         waitForStart();
 
         if (isStopRequested()) return;
