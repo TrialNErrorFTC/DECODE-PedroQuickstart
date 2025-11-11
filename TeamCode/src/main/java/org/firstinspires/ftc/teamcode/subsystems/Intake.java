@@ -1,19 +1,20 @@
 //package org.firstinspires.ftc.teamcode.subsystems;
 //
-//import androidx.annotation.NonNull;
+//import com.qualcomm.robotcore.hardware.DcMotor;
+//import com.qualcomm.robotcore.hardware.HardwareMap;
+//import com.seattlesolvers.solverslib.command.SubsystemBase;
+//import com.seattlesolvers.solverslib.hardware.motors.Motor;
 //
-//import dev.frozenmilk.dairy.core.dependency.Dependency;
-//import dev.frozenmilk.mercurial.subsystems.Subsystem;
+//public class Intake extends SubsystemBase {
+//    private final Motor intakeMotor;
 //
-//public class Intake implements Subsystem {
-//    @NonNull
-//    @Override
-//    public Dependency<?> getDependency() {
-//        return null;
+//    public Intake(final HardwareMap hardwareMap, final String name){
+//       intakeMotor = new Motor(hardwareMap, name);
 //    }
 //
 //    @Override
 //    public void setDependency(@NonNull Dependency<?> dependency) {x
 //
 //    }
+//    public intake(final)
 //}
