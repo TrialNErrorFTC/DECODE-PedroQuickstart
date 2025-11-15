@@ -9,9 +9,10 @@ import org.firstinspires.ftc.teamcode.commands.TeleOpDrive;
 import org.firstinspires.ftc.teamcode.subsystems.NonPedroDrive;
 
 public class Drive extends CommandOpMode {
-    private MecanumDrive m_robotDrive;
+    private NonPedroDrive m_robotDrive;
     private Motor fL, fR, bL, bR;
     private GamepadEx m_driverOp;
+    private TeleOpDrive m_driveCommand;
 
     public void initialize(){
         fL = new Motor(hardwareMap, "frontLeft");
@@ -20,9 +21,14 @@ public class Drive extends CommandOpMode {
         bR = new Motor(hardwareMap, "backRight");
 
         // create our drive object
-        m_robotDrive = new MecanumDrive(fL, fR, bL, bR);
+        m_robotDrive = new NonPedroDrive(hardwareMap);
 
         m_driverOp = new GamepadEx(gamepad1);
         m_driveCommand = new TeleOpDrive(m_robotDrive, () -> m_driverOp.getLeftX(), () -> m_driverOp.getRightX(), () -> m_driverOp.getLeftY());
+
+        //create intake button
+
+        register(m_robotDrive);
+        m_robotDrive.setDefaultCommand(m_driveCommand);
     }
 }
