@@ -15,10 +15,10 @@ public class NonPedroDrive extends SubsystemBase {
     private final Motor backRightMotor;
     private final MecanumDrive mecanum;
     public NonPedroDrive(final HardwareMap hardwareMap){
-        frontLeftMotor = new Motor(hardwareMap, "frontLeft");
-        frontRightMotor = new Motor(hardwareMap, "frontRight");
-        backLeftMotor = new Motor(hardwareMap, "backLeft");
-        backRightMotor = new Motor(hardwareMap, "backRight");
+        frontLeftMotor = new Motor(hardwareMap, "motorFL");
+        frontRightMotor = new Motor(hardwareMap, "motorFR");
+        backLeftMotor = new Motor(hardwareMap, "motorBL");
+        backRightMotor = new Motor(hardwareMap, "motorBR");
         mecanum = new MecanumDrive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
     }
     public void teleop(final double strafe, final double forward, final double turn){
