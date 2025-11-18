@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -8,6 +9,8 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import org.firstinspires.ftc.teamcode.commands.TeleOpDrive;
 import org.firstinspires.ftc.teamcode.subsystems.NonPedroDrive;
 
+
+@TeleOp
 public class Drive extends CommandOpMode {
     private NonPedroDrive m_robotDrive;
     private Motor fL, fR, bL, bR;
