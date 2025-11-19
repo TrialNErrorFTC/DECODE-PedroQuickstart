@@ -19,4 +19,5 @@ public class ShooterSubsystem extends SubsystemBase {
     public void reverse(){
         shooterMotor.set(-0.7);
     }
+    public void stop(){shooterMotor.set(0);}
 }
