@@ -34,6 +34,9 @@ public class Drive extends CommandOpMode {
     private Button m_intakeReverseButton;
     private Trigger m_intakeStopTrigger;
     private Trigger m_shooterStopTrigger;
+    private Button m_shooterSpinButton;
+    private Button m_shooterReverseButton;
+    private InstantCommand m_driveTestCommand;
 
     public void initialize(){
         // create our drive object
@@ -49,7 +52,7 @@ public class Drive extends CommandOpMode {
         m_driverOp = new GamepadEx(gamepad1);
 
         //setup commands
-        m_driveCommand = new TeleOpDrive(m_robotDrive, () -> m_driverOp.getLeftX(), () -> m_driverOp.getRightX(), () -> m_driverOp.getLeftY());
+        m_driveCommand = new TeleOpDrive(m_robotDrive, () -> m_driverOp.getLeftX(), () -> m_driverOp.getRightX(), () ->  m_driverOp.getLeftY());
 
 
         //intake commands
@@ -90,22 +93,23 @@ public class Drive extends CommandOpMode {
             m_shooter.stop();
         }, m_shooter);
 
+
         //create intake buttons(2 buttons for now)
         m_intakeSpinButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE).whileHeld(m_intakeSpinCommand));
         m_intakeReverseButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE).whileHeld(m_intakeReverseCommand));
 
         //create shooter buttons(2 buttons for now)
-        m_intakeSpinButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.SQUARE).whileHeld(m_intakeSpinCommand));
-        m_intakeReverseButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.CROSS).whileHeld(m_intakeReverseCommand));
+        m_shooterSpinButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.SQUARE).whileHeld(m_shooterSpinCommand));
+        m_shooterReverseButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.CROSS).whileHeld(m_shooterReverseCommand));
 
-        // create stop triggers for intake and shooter
+        //BACKUP - create stop triggers for intake and shooter
         m_intakeStopTrigger = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE)
-                .or(new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE))
+                .and(new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE))
                 .whenInactive(m_intakeStopCommand)
         );
 
-        m_shooterStopTrigger = (new GamepadButton(m_driverOp, GamepadKeys.Button.SQUARE)
-                .or(new GamepadButton(m_driverOp, GamepadKeys.Button.CROSS))
+        m_shooterStopTrigger = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE)
+                .or(new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE))
                 .whenInactive(m_intakeStopCommand)
         );
 

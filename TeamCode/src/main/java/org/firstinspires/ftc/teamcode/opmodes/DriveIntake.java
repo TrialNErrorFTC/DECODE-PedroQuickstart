@@ -31,6 +31,7 @@ public class DriveIntake extends LinearOpMode {
         while (opModeIsActive()) {
             for (DcMotor testMotor: dcMotors) {
                 testMotor.setPower(1.0);
+                sleep(1500);
             }
         }
     }

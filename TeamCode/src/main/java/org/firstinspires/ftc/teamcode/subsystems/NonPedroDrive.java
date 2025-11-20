@@ -13,16 +13,33 @@ public class NonPedroDrive extends SubsystemBase {
     private final Motor frontRightMotor;
     private final Motor backLeftMotor;
     private final Motor backRightMotor;
-    private final MecanumDrive mecanum;
     public NonPedroDrive(final HardwareMap hardwareMap){
         frontLeftMotor = new Motor(hardwareMap, "motorFL");
         frontRightMotor = new Motor(hardwareMap, "motorFR");
         backLeftMotor = new Motor(hardwareMap, "motorBL");
         backRightMotor = new Motor(hardwareMap, "motorBR");
-        mecanum = new MecanumDrive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+        backLeftMotor.setInverted(true);
+        frontLeftMotor.setInverted(true);
     }
     public void teleop(final double strafe, final double forward, final double turn){
-        mecanum.driveRobotCentric(strafe, forward, turn);
+
+        double y = forward; // Remember, Y stick value is reversed
+        double x = 1.1 * strafe ; // Counteract imperfect strafing
+        double rx = turn;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double frontLeftPower = (y + x + rx) / denominator;
+        double backLeftPower = (y - x + rx) / denominator;
+        double frontRightPower = (y - x - rx) / denominator;
+        double backRightPower = (y + x - rx) / denominator;
+
+        frontLeftMotor.set(frontLeftPower);
+        backLeftMotor.set(backLeftPower);
+        frontRightMotor.set(frontRightPower);
+        backRightMotor.set(backRightPower);
     }
     /**
      * Gets a specific motor assigned to the motor name
