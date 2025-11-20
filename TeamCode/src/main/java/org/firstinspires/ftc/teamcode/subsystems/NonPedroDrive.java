@@ -2,10 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
-import java.util.HashMap;
 import java.util.Objects;
 
 public class NonPedroDrive extends SubsystemBase {
@@ -21,20 +19,30 @@ public class NonPedroDrive extends SubsystemBase {
         backLeftMotor.setInverted(true);
         frontLeftMotor.setInverted(true);
     }
+
+
+    /**
+     * Drives the robot using mecanum drive kinematics based on joystick inputs.
+     * This method is intended to be called continuously during the tele-operated period.
+     *
+     * @param strafe  The desired sideways movement speed. Positive values strafe right, negative values strafe left. Range: [-1.0, 1.0].
+     * @param forward The desired forward/backward movement speed. Positive values move forward, negative values move backward. Range: [-1.0, 1.0].
+     * @param turn    The desired rotational speed. Positive values turn clockwise, negative values turn counter-clockwise. Range: [-1.0, 1.0].
+     */
     public void teleop(final double strafe, final double forward, final double turn){
 
-        double y = forward; // Remember, Y stick value is reversed
-        double x = 1.1 * strafe ; // Counteract imperfect strafing
-        double rx = turn;
+        double forwardSpeed = forward; // Remember, Y stick value is reversed
+        double strafeSpeed = 1.1 * strafe ; // Counteract imperfect strafing
+        double rotationSpeed = turn;
 
         // Denominator is the largest motor power (absolute value) or 1
         // This ensures all the powers maintain the same ratio,
         // but only if at least one is out of the range [-1, 1]
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-        double frontLeftPower = (y + x + rx) / denominator;
-        double backLeftPower = (y - x + rx) / denominator;
-        double frontRightPower = (y - x - rx) / denominator;
-        double backRightPower = (y + x - rx) / denominator;
+        double maxPower = Math.max(Math.abs(forwardSpeed) + Math.abs(strafeSpeed) + Math.abs(rotationSpeed), 1);
+        double frontLeftPower = (forwardSpeed + strafeSpeed + rotationSpeed) / maxPower;
+        double backLeftPower = (forwardSpeed - strafeSpeed + rotationSpeed) / maxPower;
+        double frontRightPower = (forwardSpeed - strafeSpeed - rotationSpeed) / maxPower;
+        double backRightPower = (forwardSpeed + strafeSpeed - rotationSpeed) / maxPower;
 
         frontLeftMotor.set(frontLeftPower);
         backLeftMotor.set(backLeftPower);
