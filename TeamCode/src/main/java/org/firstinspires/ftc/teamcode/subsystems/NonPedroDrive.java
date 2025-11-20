@@ -19,7 +19,7 @@ public class NonPedroDrive extends SubsystemBase {
         frontRightMotor = new Motor(hardwareMap, "motorFR");
         backLeftMotor = new Motor(hardwareMap, "motorBL");
         backRightMotor = new Motor(hardwareMap, "motorBR");
-        mecanum = new MecanumDrive(frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
+        mecanum = new MecanumDrive(true, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
     }
     public void teleop(final double strafe, final double forward, final double turn){
         mecanum.driveRobotCentric(strafe, forward, turn);
