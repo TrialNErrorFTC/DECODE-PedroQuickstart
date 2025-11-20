@@ -24,17 +24,21 @@ public class NonPedroDrive extends SubsystemBase {
     public void teleop(final double strafe, final double forward, final double turn){
         mecanum.driveRobotCentric(strafe, forward, turn);
     }
+    /**
+     * Gets a specific motor assigned to the motor name
+     * @param motorName the name of the motor to the pull
+     */
     public Motor getMotor(final String motorName){
-        if(Objects.equals(motorName, "frontLeft")){
+        if(Objects.equals(motorName, "motorFL")){
             return frontLeftMotor;
         }
-        if(Objects.equals(motorName, "frontRight")){
+        if(Objects.equals(motorName, "motorFR")){
             return frontRightMotor;
         }
-        if(Objects.equals(motorName, "backLeft")){
+        if(Objects.equals(motorName, "motorBL")){
             return backLeftMotor;
         }
-        if(Objects.equals(motorName, "backRight")){
+        if(Objects.equals(motorName, "motorBR")){
             return backRightMotor;
         }
         return null;

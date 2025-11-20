@@ -101,12 +101,12 @@ public class Drive extends CommandOpMode {
         // create stop triggers for intake and shooter
         m_intakeStopTrigger = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE)
                 .or(new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE))
-                .whenActive(m_intakeStopCommand)
+                .whenInactive(m_intakeStopCommand)
         );
 
         m_shooterStopTrigger = (new GamepadButton(m_driverOp, GamepadKeys.Button.SQUARE)
                 .or(new GamepadButton(m_driverOp, GamepadKeys.Button.CROSS))
-                .whenActive(m_intakeStopCommand)
+                .whenInactive(m_intakeStopCommand)
         );
 
         telemetry.addLine("Setting Up All subsystems:");
