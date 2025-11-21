@@ -1,25 +1,17 @@
 package org.firstinspires.ftc.teamcode.subsystems;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.hardware.impl.MotorEx;
+import dev.nextftc.hardware.powerable.SetPower;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
+public class Intake implements Subsystem {
+    public static final Intake INSTANCE = new Intake();
+    private Intake() {}
 
-public class Intake extends SubsystemBase {
-    private final Motor intakeMotor;
+    private MotorEx shooter_motor = new MotorEx("motorS");
+    public Command forward = new SetPower(shooter_motor, 0.7).requires(this);
+    public Command reverse = new SetPower(shooter_motor, -0.7).requires(this);
+    public Command stop = new SetPower(shooter_motor, 0.0).requires(this);
 
-    public Intake(final HardwareMap hardwareMap, final String name){
-       intakeMotor = new Motor(hardwareMap, name);
-       int p = 10;
-       int i = 3;
-       intakeMotor.setRunMode(Motor.RunMode.RawPower);
-    }
-    public void spin(){
-        intakeMotor.set(0.7);
-    }
-    public void reverse(){
-        intakeMotor.set(-0.7);
-    }
-    public void stop(){intakeMotor.set(0);}
 
 }
