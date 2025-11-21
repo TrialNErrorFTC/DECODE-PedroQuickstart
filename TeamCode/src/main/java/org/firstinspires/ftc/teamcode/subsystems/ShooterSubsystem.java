@@ -20,4 +20,11 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterMotor.set(-0.7);
     }
     public void stop(){shooterMotor.set(0);}
+    public Boolean isOff(){
+        if (shooterMotor.get() == 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

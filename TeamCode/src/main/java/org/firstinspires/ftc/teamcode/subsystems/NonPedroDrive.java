@@ -32,7 +32,7 @@ public class NonPedroDrive extends SubsystemBase {
     public void teleop(final double strafe, final double forward, final double turn){
 
         double forwardSpeed = forward; // Remember, Y stick value is reversed
-        double strafeSpeed = 1.1 * strafe ; // Counteract imperfect strafing
+        double strafeSpeed = 1.1 * strafe; // Counteract imperfect strafing
         double rotationSpeed = turn;
 
         // Denominator is the largest motor power (absolute value) or 1

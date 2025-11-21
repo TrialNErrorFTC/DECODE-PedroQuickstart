@@ -21,5 +21,11 @@ public class Intake extends SubsystemBase {
         intakeMotor.set(-0.7);
     }
     public void stop(){intakeMotor.set(0);}
-
+    public Boolean isOff(){
+        if (intakeMotor.get() == 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

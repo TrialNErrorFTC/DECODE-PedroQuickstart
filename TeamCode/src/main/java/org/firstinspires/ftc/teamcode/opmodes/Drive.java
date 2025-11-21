@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.button.Button;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
@@ -94,25 +95,47 @@ public class Drive extends CommandOpMode {
         }, m_shooter);
 
 
-        //create intake buttons(2 buttons for now)
-        m_intakeSpinButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE).whileHeld(m_intakeSpinCommand));
-        m_intakeReverseButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE).whileHeld(m_intakeReverseCommand));
+        //create intake buttons(2 button for now)
+        m_intakeSpinButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE)
+                .whenPressed(
+                        new ConditionalCommand(
+                                m_intakeSpinCommand,
+                                m_intakeStopCommand,
+                                () -> m_intake.isOff()
+                        )
+                )
+        );
+        m_intakeReverseButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE)
+                        .whenPressed(
+                                new ConditionalCommand(
+                                        m_intakeReverseCommand,
+                                        m_intakeStopCommand,
+                                        () -> m_intake.isOff()
+                                )
+                        ));
 
-        //create shooter buttons(2 buttons for now)
-        m_shooterSpinButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.SQUARE).whileHeld(m_shooterSpinCommand));
-        m_shooterReverseButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.CROSS).whileHeld(m_shooterReverseCommand));
+        //create shooter buttons(2 button for now)
+        m_shooterSpinButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.SQUARE)
+                .whenPressed(
+                        new ConditionalCommand(
+                                m_shooterSpinCommand,
+                                m_intakeStopCommand,
+                                () -> m_shooter.isOff()
+                        )
+                )
+        );
+        m_shooterReverseButton = (new GamepadButton(m_driverOp, GamepadKeys.Button.CROSS)
+                        .whenPressed(
+                                new ConditionalCommand(
+                                        m_shooterReverseCommand,
+                                        m_shooterStopCommand,
+                                        () -> m_shooter.isOff()
+                                )
+                        )
+        );
+
 
         //BACKUP - create stop triggers for intake and shooter
-        m_intakeStopTrigger = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE)
-                .and(new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE))
-                .whenInactive(m_intakeStopCommand)
-        );
-
-        m_shooterStopTrigger = (new GamepadButton(m_driverOp, GamepadKeys.Button.TRIANGLE)
-                .or(new GamepadButton(m_driverOp, GamepadKeys.Button.CIRCLE))
-                .whenInactive(m_intakeStopCommand)
-        );
-
         telemetry.addLine("Setting Up All subsystems:");
         telemetry.update();
 
