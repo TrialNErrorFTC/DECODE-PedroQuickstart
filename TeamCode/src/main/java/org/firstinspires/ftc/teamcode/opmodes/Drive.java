@@ -58,6 +58,16 @@ public class Drive extends NextFTCOpMode {
                 .whenBecomesTrue(Shooter.INSTANCE.reverse)
                 .whenBecomesFalse(Shooter.INSTANCE.stop);
 
+        /*
+        * Goals for Today:
+        * Setup Buttons
+        * Setup Code for Field Driving
+        * */
 
+        //Buttons
+
+        //TODO: Setup the right bumper -> forward
+        //TODO: Setup left bumper -> shoot
+        //TODO: Setup
     }
 }
