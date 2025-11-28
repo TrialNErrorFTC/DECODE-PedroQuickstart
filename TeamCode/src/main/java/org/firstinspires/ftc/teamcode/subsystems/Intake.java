@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.conditionals.IfElseCommand;
 import dev.nextftc.core.commands.utility.InstantCommand;
+import dev.nextftc.core.commands.utility.LambdaCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
@@ -40,27 +41,25 @@ public class Intake implements Subsystem {
      * Flag to determine the direction of the intake motor.
      * true for forwards, false for reverse.
      */
-    private boolean reversed = false;
+    public boolean reversed = false;
+
     /**
      * Command to spin the intake motor. The direction is determined by the 'reversed' flag.
      */
-    public Command spin = new IfElseCommand(
-            () -> reversed,
-            new SetPower(intake_motor, speed).requires(this),
-            new SetPower(intake_motor, -speed).requires(this)
-    );
+    public Command forward = new SetPower(intake_motor, speed).requires(this);
+    public Command reverse = new SetPower(intake_motor, -speed).requires(this);
+    public void setReversed(Boolean value){
+        reversed = value;
+    }
+    public Command stop = new SetPower(intake_motor, 0.0).requires(this);
 
     /**
      * Sets the direction of the intake.
      * @param value true for forward, false for reverse.
      */
-    public void setReversed(Boolean value){
-        reversed = value;
-    }
     /**
      * Command to stop the intake motor.
      */
-    public Command stop = new SetPower(intake_motor, 0.0).requires(this);
 }
  /*
 intake - r bumper,

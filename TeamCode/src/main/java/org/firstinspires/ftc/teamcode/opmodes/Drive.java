@@ -2,12 +2,16 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.commands.TrackAprilTag;
+import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightHelper;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 import java.util.function.Supplier;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.conditionals.IfElseCommand;
 import dev.nextftc.core.commands.utility.NullCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -29,7 +33,7 @@ public class Drive extends NextFTCOpMode {
      */
     public Drive() {
         addComponents(
-                new SubsystemComponent(Intake.INSTANCE, Shooter.INSTANCE), // Adds the Intake and Shooter subsystems
+                new SubsystemComponent(Intake.INSTANCE, Shooter.INSTANCE, LimelightHelper.INSTANCE, DriveTrain.INSTANCE), // Adds the Intake and Shooter subsystems
                 BulkReadComponent.INSTANCE, // Enables bulk reading of sensor data
                 BindingsComponent.INSTANCE // Enables gamepad control bindings
         );
@@ -55,18 +59,20 @@ public class Drive extends NextFTCOpMode {
                 backRightMotor,
                 Gamepads.gamepad1().leftStickY().negate().map((x)->speed * x), // Forward/backward movement
                 Gamepads.gamepad1().leftStickX(), // Strafe movement
-                Gamepads.gamepad1().rightStickX().map((x) -> x*x) // Rotational movement
+                Gamepads.gamepad1().rightStickX().map((x) -> x) // Rotational movement
         );
 
+        Command m_track = new TrackAprilTag();
+
         Command shoot_command = new NullCommand(); // Placeholder for the shooting command
-        driverControlled.schedule(); // Schedules the driver-controlled command to run
+        m_track.schedule(); // Schedules the driver-controlled command to run
 
         // Gamepad 1 Button Mappings
 
         // Right Bumper: Toggles the intake on and off
         Gamepads.gamepad1().rightBumper()
                 .toggleOnBecomesTrue()
-                .whenBecomesTrue(Intake.INSTANCE.spin)
+                .whenBecomesTrue(Intake.INSTANCE.forward)
                 .whenBecomesFalse(Intake.INSTANCE.stop);
 
         // Left Bumper: Activates the shooter
@@ -87,10 +93,12 @@ public class Drive extends NextFTCOpMode {
 
         // Triangle: Sets the intake to reverse direction
         Gamepads.gamepad1().triangle()
-                .whenBecomesTrue(Intake.INSTANCE.toggleReverse);
+                .toggleOnBecomesTrue()
+                .whenBecomesTrue(Intake.INSTANCE.reverse)
+                .whenBecomesFalse(Intake.INSTANCE.stop);
+        Gamepads.gamepad1().circle()
+                .toggleOnBecomesTrue()
+                .whenBecomesTrue(m_track);
 
-        // Circle: Sets the intake to forward direction
-        Gamepads.gamepad1().triangle()
-                .whenBecomesTrue(Intake.INSTANCE.toggleForwards);
     }
 }

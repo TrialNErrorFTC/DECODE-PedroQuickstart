@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.utility.NullCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
@@ -17,15 +18,15 @@ public class Shooter implements Subsystem {
     /**
      * Runnable to set the shooter to high speed.
      */
-    public Runnable highSpeed;
+    public Command highSpeed = new NullCommand();
     /**
      * Runnable to set the shooter to normal speed.
      */
-    public Runnable normalSpeed;
+    public Command normalSpeed = new NullCommand();
     /**
      * Runnable to set the shooter to low speed.
      */
-    public Runnable lowSpeed;
+    public Command lowSpeed = new NullCommand();
 
     /**
      * Private constructor to prevent instantiation outside of the singleton.
