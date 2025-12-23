@@ -7,11 +7,15 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightHelper;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.conditionals.IfElseCommand;
+import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.commands.utility.NullCommand;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
@@ -27,13 +31,15 @@ import dev.nextftc.hardware.impl.MotorEx;
  */
 @TeleOp(name = "Drive(NextFTC)")
 public class Drive extends NextFTCOpMode {
+    private static final Logger log = LoggerFactory.getLogger(Drive.class);
+
     /**
      * Constructor for the Drive opmode.
      * It adds the necessary components for the robot to function.
      */
     public Drive() {
         addComponents(
-                new SubsystemComponent(Intake.INSTANCE, Shooter.INSTANCE, LimelightHelper.INSTANCE, DriveTrain.INSTANCE), // Adds the Intake and Shooter subsystems
+                new SubsystemComponent(Intake.INSTANCE, Shooter.INSTANCE, DriveTrain.INSTANCE), // Adds the Intake and Shooter subsystems
                 BulkReadComponent.INSTANCE, // Enables bulk reading of sensor data
                 BindingsComponent.INSTANCE // Enables gamepad control bindings
         );
@@ -48,6 +54,11 @@ public class Drive extends NextFTCOpMode {
      * This method is called when the start button is pressed on the driver station.
      * It sets up the driver-controlled mecanum drive and the gamepad button bindings.
      */
+
+    @Override
+    public void onInit(){
+        Transfer.INSTANCE.off_position.schedule();
+    }
     @Override
     public void onStartButtonPressed() {
         Double speed = 0.7; // Default driving speed
@@ -57,43 +68,37 @@ public class Drive extends NextFTCOpMode {
                 frontRightMotor,
                 backLeftMotor,
                 backRightMotor,
-                Gamepads.gamepad1().leftStickY().negate().map((x)->speed * x), // Forward/backward movement
+                Gamepads.gamepad1().leftStickY().negate().map((x)->speed * x),  // Forward/backward movement
                 Gamepads.gamepad1().leftStickX(), // Strafe movement
                 Gamepads.gamepad1().rightStickX().map((x) -> x) // Rotational movement
         );
 
 
-        Command shoot_command = new NullCommand(); // Placeholder for the shooting command
+        driverControlled.schedule(); // Schedules the driver-controlled command to run
 
         // Gamepad 1 Button Mappings
 
         // Right Bumper: Toggles the intake on and off
         Gamepads.gamepad1().rightBumper()
-                .toggleOnBecomesTrue()
                 .whenBecomesTrue(Intake.INSTANCE.forward)
                 .whenBecomesFalse(Intake.INSTANCE.stop);
 
         // Left Bumper: Activates the shooter
         Gamepads.gamepad1().leftBumper()
-                .whenBecomesTrue(shoot_command);
+                .whenBecomesTrue(Transfer.INSTANCE.shoot_position)
+                .whenBecomesFalse(Transfer.INSTANCE.off_position);
 
         // D-pad Up: Sets the shooter to high speed
-        Gamepads.gamepad1().dpadUp()
+        Gamepads.gamepad1().cross()
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue(Shooter.INSTANCE.highSpeed)
-                .whenBecomesFalse(Shooter.INSTANCE.normalSpeed);
-
-        // D-pad Down: Sets the shooter to low speed
-        Gamepads.gamepad1().dpadUp()
-                .toggleOnBecomesTrue()
-                .whenBecomesTrue(Shooter.INSTANCE.lowSpeed)
-                .whenBecomesFalse(Shooter.INSTANCE.normalSpeed);
+                .whenBecomesFalse(Shooter.INSTANCE.stop);
 
         // Triangle: Sets the intake to reverse direction
         Gamepads.gamepad1().triangle()
-                .toggleOnBecomesTrue()
                 .whenBecomesTrue(Intake.INSTANCE.reverse)
                 .whenBecomesFalse(Intake.INSTANCE.stop);
+
 
     }
 }

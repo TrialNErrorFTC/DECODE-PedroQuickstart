@@ -49,9 +49,10 @@ public class Intake implements Subsystem {
     public Command forward = new SetPower(intake_motor, speed).requires(this);
     public Command reverse = new SetPower(intake_motor, -speed).requires(this);
     public void setReversed(Boolean value){
-        reversed = value;
+        reversed = !value;
     }
-    public Command stop = new SetPower(intake_motor, 0.0).requires(this);
+    public Command stop = new SetPower(intake_motor, 0.0).requires(  this);
+
 
     /**
      * Sets the direction of the intake.

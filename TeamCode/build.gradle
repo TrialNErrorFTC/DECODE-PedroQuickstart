@@ -15,6 +15,7 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
+apply plugin: 'kotlin-android'
 // there should be 2 or 3 more lines that start with 'apply plugin:' here
 android {
     namespace = 'org.firstinspires.ftc.teamcode'

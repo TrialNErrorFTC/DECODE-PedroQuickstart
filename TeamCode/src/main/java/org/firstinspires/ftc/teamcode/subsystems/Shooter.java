@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.commands.utility.NullCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
@@ -15,18 +16,7 @@ public class Shooter implements Subsystem {
      * Singleton instance of the Shooter subsystem.
      */
     public static final Shooter INSTANCE = new Shooter();
-    /**
-     * Runnable to set the shooter to high speed.
-     */
-    public Command highSpeed = new NullCommand();
-    /**
-     * Runnable to set the shooter to normal speed.
-     */
-    public Command normalSpeed = new NullCommand();
-    /**
-     * Runnable to set the shooter to low speed.
-     */
-    public Command lowSpeed = new NullCommand();
+
 
     /**
      * Private constructor to prevent instantiation outside of the singleton.
@@ -36,15 +26,23 @@ public class Shooter implements Subsystem {
     /**
      * The motor for the shooter system.
      */
-    private MotorEx shooter_motor = new MotorEx("motorS");
+    private final MotorEx shooter_motor = new MotorEx("motorS").reversed();
+
+
     /**
-     * Command to run the shooter motor forward.
+     * Runnable to set the shooter to high speed.
      */
-    public Command forward = new SetPower(shooter_motor, 0.7).requires(this);
+    public Command highSpeed = new SetPower(shooter_motor, 0.75).requires(this);
     /**
-     * Command to run the shooter motor in reverse.
+     * Runnable to set the shooter to normal speed. (this is adjustable speed for the tuning in order to accurately shoot)
      */
-    public Command reverse = new SetPower(shooter_motor, -0.7).requires(this);
+    public Command normalSpeed = new SetPower(shooter_motor, 0.5).requires(this);
+    /**
+     * Runnable to set the shooter to low speed.
+     */
+    public Command lowSpeed = new SetPower(shooter_motor, 0.3).requires(this);
+
+
     /**
      * Command to stop the shooter motor.
      */
