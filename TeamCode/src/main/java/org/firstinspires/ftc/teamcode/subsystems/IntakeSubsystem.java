@@ -1,4 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.conditionals.IfElseCommand;
 import dev.nextftc.core.commands.utility.InstantCommand;
@@ -8,64 +15,21 @@ import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.powerable.SetPower;
 import kotlin.time.Instant;
 
-/**
- * The Intake subsystem is responsible for controlling the robot's intake mechanism.
- * It uses a single motor to spin and collect items.
- */
-public class Intake implements Subsystem {
-    /**
-     * Singleton instance of the Intake subsystem.
-     */
-    public static final Intake INSTANCE = new Intake();
-    /**
-     * Command to set the intake to spin in the reverse direction.
-     */
-    public Command toggleReverse = new InstantCommand(() -> INSTANCE.setReversed(false));
-    /**
-     * Command to set the intake to spin in the forward direction.
-     */
-    public Command toggleForwards = new InstantCommand(() -> INSTANCE.setReversed(true));
-    /**
-     * Private constructor to prevent instantiation outside of the singleton.
-     */
-    private Intake() {}
-    /**
-     * The motor for the intake system.
-     */
-    private MotorEx intake_motor = new MotorEx("motorI");
-    /**
-     * The default speed for the intake motor.
-     */
-    private double speed = 0.7;
-    /**
-     * Flag to determine the direction of the intake motor.
-     * true for forwards, false for reverse.
-     */
-    public boolean reversed = false;
+public class IntakeSubsystem extends SubsystemBase {
 
-    /**
-     * Command to spin the intake motor. The direction is determined by the 'reversed' flag.
-     */
-    public Command forward = new SetPower(intake_motor, speed).requires(this);
-    public Command reverse = new SetPower(intake_motor, -speed).requires(this);
-    public void setReversed(Boolean value){
-        reversed = !value;
+    DcMotor motor_intake;
+    public IntakeSubsystem(HardwareMap hMap){
+        motor_intake = hMap.get(DcMotor.class, "motorI");
+        motor_intake.setMode(RUN_WITHOUT_ENCODER);
     }
-    public Command stop = new SetPower(intake_motor, 0.0).requires(  this);
 
-
-    /**
-     * Sets the direction of the intake.
-     * @param value true for forward, false for reverse.
-     */
-    /**
-     * Command to stop the intake motor.
-     */
+    public void forward(){
+        motor_intake.setPower(0.7);
+    }
+    public void reverse(){
+        motor_intake.setPower(-0.7);
+    }
+    public void stop(){
+        motor_intake.setPower(0);
+    }
 }
- /*
-intake - r bumper,
-servo that shoots - left bumper
-
-configuration
-- intake is all
-  */

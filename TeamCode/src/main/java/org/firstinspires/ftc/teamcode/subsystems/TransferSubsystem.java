@@ -1,19 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
+
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPosition;
 
-public class Transfer implements Subsystem {
-    public static final Transfer INSTANCE = new Transfer();
-
-    private Transfer() {
+public class TransferSubsystem extends SubsystemBase {
+    Servo servo_transfer;
+    public TransferSubsystem(HardwareMap hMap){
+        servo_transfer = hMap.get(Servo.class, "servoTransfer");
     }
-
-   public ServoEx servo_transfer =  new ServoEx("servoTransfer");
-    public Command shoot_position = new SetPosition(servo_transfer, 0).requires(this);
-    public Command off_position = new SetPosition(servo_transfer, 0.84).requires(this);
-
+    public void shoot_position(){
+        servo_transfer.setPosition(0);
+    }
+    public void off_position(){
+        servo_transfer.setPosition(0.84);
+    }
 }
-
