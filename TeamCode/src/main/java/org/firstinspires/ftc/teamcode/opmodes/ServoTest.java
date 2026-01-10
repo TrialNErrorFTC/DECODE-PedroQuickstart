@@ -71,24 +71,20 @@ public class ServoTest extends LinearOpMode {
         servoLeft.setDirection(Servo.Direction.REVERSE);
         servoRight.setDirection(Servo.Direction.FORWARD);
 
-        initializeServos();
+        servoLeft.setPosition(0);
+        servoRight.setPosition(0);
+
         // Wait for the game to start (driver presses START)
         waitForStart();
-        runtime.reset();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            setServos(Angle.fromDeg(30));
+            telemetry.addData("Status", "Running");
+            telemetry.update();
+            servoLeft.setPosition(1.0);
+            servoRight.setPosition(1.0);
         }
     }
-    public void initializeServos(){
-        servoLeft.setPosition(Angle.fromDeg(0).inRev);
-        servoRight.setPosition(Angle.fromDeg(0).inRev);
-    }
-    public void setServos(Angle angle){
-        servoLeft.setPosition(angle.inRev);
-        servoRight.setPosition(angle.inRev);
 
-    }
 //    public void adjustAngle(Angle angle){
 //        servoLeft.setDirection(servoLeft.getPosition());
 //    }
