@@ -83,20 +83,17 @@ public class distanceEstimation extends LinearOpMode {
                 telemetry.addData("Target Area", ta);
 
                  // how many degrees back is your limelight rotated from perfectly vertical?
-                Angle limelightMountAngle = Angle.fromDeg(27);
+                Angle limelightMountAngle = Angle.fromDeg(51);
 
                 // distance from the center of the Limelight lens to the floor
-                Distance limelightHeight = Distance.fromIn(24);
+                Distance limelightLensHeight = Distance.fromIn(11);
 
                 //target to floor
-                Distance goalHeight = Distance.fromIn(40);
+                Distance goalHeight = Distance.fromIn(26);
 
                 Angle angleToGoal = limelightMountAngle.plus(ty);
 
-                Distance distanceToGoal = (goalHeight.minus(limelightHeight)).div(Math.tan(angleToGoal.inRad));
-
-                telemetry.addData("Distance", distanceToGoal);
-
+                double distanceFromLimelightGoal = (goalHeight.inIn - limelightLensHeight.inIn) / Math.tan(angleToGoal.inRad);
 
             } else {
                 telemetry.addData("Limelight", "No Targets");
