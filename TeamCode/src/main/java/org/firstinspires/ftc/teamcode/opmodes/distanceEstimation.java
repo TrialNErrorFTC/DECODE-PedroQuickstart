@@ -75,7 +75,7 @@ public class distanceEstimation extends LinearOpMode {
             LLResult result = limelight.getLatestResult();
             if (result != null && result.isValid()) {
                 double tx = result.getTx(); // How far left or right the target is (degrees)
-                double ty = result.getTy(); // How far up or down the target is (degrees)
+                Angle ty = Angle.fromDeg(result.getTy()); // How far up or down the target is (degrees)
                 double ta = result.getTa(); // How big the target looks (0%-100% of the image)
 
                 telemetry.addData("Target X", tx);
@@ -83,15 +83,17 @@ public class distanceEstimation extends LinearOpMode {
                 telemetry.addData("Target Area", ta);
 
                  // how many degrees back is your limelight rotated from perfectly vertical?
-                Angle limelightMountAngleDegrees = Angle.fromDeg(27);
+                Angle limelightMountAngle = Angle.fromDeg(51);
 
                 // distance from the center of the Limelight lens to the floor
-                Distance limelightHeightInches = Distance.fromIn(24);
+                Distance limelightLensHeight = Distance.fromIn(11);
 
                 //target to floor
-                Distance goalHeightInches = Distance.fromIn(40);
+                Distance goalHeight = Distance.fromIn(26);
 
+                Angle angleToGoal = limelightMountAngle.plus(ty);
 
+                double distanceFromLimelightGoal = (goalHeight.inIn - limelightLensHeight.inIn) / Math.tan(angleToGoal.inRad);
 
             } else {
                 telemetry.addData("Limelight", "No Targets");

@@ -77,7 +77,7 @@ public class ServoTest extends LinearOpMode {
         runtime.reset();
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            setServos(Angle.fromDeg(30));
+            setServos(Angle.fromDeg(-30));
         }
     }
     public void initializeServos(){
