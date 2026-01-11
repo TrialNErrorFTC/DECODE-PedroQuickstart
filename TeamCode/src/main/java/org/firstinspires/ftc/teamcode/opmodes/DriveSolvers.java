@@ -8,6 +8,7 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.commands.DefaultDrive;
 import org.firstinspires.ftc.teamcode.subsystems.DrivetrainSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
@@ -35,12 +36,9 @@ public class DriveSolvers extends CommandOpMode {
 
         InstantCommand m_initialize = new InstantCommand(m_shooter::initializeServos);
         InstantCommand m_offCommand = new InstantCommand(m_transfer::off_position);
-        InstantCommand m_driveCommand = new InstantCommand(
-                ()->{
-                    m_drivetrain.drive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
-                }, m_drivetrain
-        );
-        m_driveCommand.schedule();
+        DefaultDrive m_driveCommand = new DefaultDrive(m_drivetrain, () -> -driverOp.getLeftY(), driverOp::getLeftX, driverOp::getRightX);
+
+        m_drivetrain.setDefaultCommand(m_driveCommand);
         m_offCommand.schedule();
         m_initialize.schedule();
 
