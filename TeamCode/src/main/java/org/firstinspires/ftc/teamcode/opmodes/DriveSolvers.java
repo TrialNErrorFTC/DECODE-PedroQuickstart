@@ -3,10 +3,14 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.PerpetualCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.button.Button;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
+import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.gamepad.TriggerReader;
 
 import org.firstinspires.ftc.teamcode.commands.DefaultDrive;
 import org.firstinspires.ftc.teamcode.subsystems.DrivetrainSubsystem;
@@ -34,9 +38,17 @@ public class DriveSolvers extends CommandOpMode {
         TransferSubsystem m_transfer = new TransferSubsystem(hardwareMap);
         DrivetrainSubsystem m_drivetrain = new DrivetrainSubsystem(hardwareMap);
 
+
         InstantCommand m_initialize = new InstantCommand(m_shooter::initializeServos);
         InstantCommand m_offCommand = new InstantCommand(m_transfer::off_position);
-        DefaultDrive m_driveCommand = new DefaultDrive(m_drivetrain, () -> -driverOp.getLeftY(), driverOp::getLeftX, driverOp::getRightX);
+        DefaultDrive m_driveCommand = new DefaultDrive(m_drivetrain, driverOp::getLeftY, driverOp::getLeftX, driverOp::getRightX);
+        SequentialCommandGroup m_newShootCommand = new SequentialCommandGroup(
+                new InstantCommand(m_transfer::shoot_position).withTimeout(350),
+                new InstantCommand(m_intake::reverse).withTimeout(50),
+                new InstantCommand(m_intake::forward).withTimeout(50)
+        );
+
+        m_offCommand.addRequirements(m_transfer);
 
         m_drivetrain.setDefaultCommand(m_driveCommand);
         m_offCommand.schedule();
@@ -83,16 +95,17 @@ public class DriveSolvers extends CommandOpMode {
                 m_intake::stop
         ));
 
-        //Binds the 'Left Bumper' button to a command that moves the transfer to the shoot position.
-        Button shootButton = new GamepadButton(
+//        //Binds the 'Left Bumper' button to a command that moves the transfer to the shoot position.
+//        Button shootButton = new GamepadButton(
+//                driverOp, GamepadKeys.Button.LEFT_BUMPER
+//        ).whenPressed(new InstantCommand(
+//                m_transfer::shoot_position
+//        )).whenReleased(new InstantCommand(
+//                m_transfer::off_position
+//        ));
+
+        Button shootButton2 = new GamepadButton(
                 driverOp, GamepadKeys.Button.LEFT_BUMPER
-        ).whenPressed(new InstantCommand(
-                m_transfer::shoot_position
-        )).whenReleased(new InstantCommand(
-                m_transfer::off_position
-        ));
-
-
-
+        ).whenPressed(m_newShootCommand);
     }
 }

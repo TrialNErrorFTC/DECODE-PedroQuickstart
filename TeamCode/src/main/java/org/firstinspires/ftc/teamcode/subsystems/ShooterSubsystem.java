@@ -29,7 +29,7 @@ public class ShooterSubsystem extends SubsystemBase {
         setServos(1);
     }
     public void highSpeed(){
-        motorShooter.setPower(0.75);
+        motorShooter.setPower(- 0.75);
     }
 
     public void stop(){

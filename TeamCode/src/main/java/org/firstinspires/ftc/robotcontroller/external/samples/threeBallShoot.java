@@ -27,25 +27,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-
-import java.util.List;
-
-import dev.nextftc.core.units.Angle;
-import dev.nextftc.core.units.Distance;
 /*
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -59,44 +51,44 @@ import dev.nextftc.core.units.Distance;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp
-public class distanceEstimation extends LinearOpMode {
-    Limelight3A limelight;
+@TeleOp(name="Three Ball Shoot", group="Linear OpMode")
+public class threeBallShoot extends LinearOpMode {
+
+    // Declare OpMode members.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor m_shooter = null;
+    private DcMotor m_intake = null;
+    private Servo m_transfer = null;
     @Override
     public void runOpMode() {
-        while (opModeInInit()){
-            limelight = hardwareMap.get(Limelight3A.class, "limelight");
-            limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
-            limelight.start(); // This tells Limelight to start looking!
-            telemetry.addData("Status", "Initialized");
-            telemetry.update();
-            // Initialize the hardware variables.
-        }
-        // Wait for the game to start (driver presses START)
+        m_shooter = hardwareMap.get(DcMotor.class, "motorS");
+        m_intake = hardwareMap.get(DcMotor.class, "motorI");
+        m_transfer = hardwareMap.get(Servo.class, "servoTransfer");
+
+        m_transfer.setPosition(0.84);
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
         waitForStart();
-        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            LLResult result = limelight.getLatestResult();
-            List<LLResultTypes.FiducialResult> fiducialResult = result.getFiducialResults();
-
-            if (result != null && result.isValid()) {
-                for (LLResultTypes.FiducialResult fiducial : fiducialResult) {
-                    int id = fiducial.getFiducialId();
-                    Position position = fiducial.getRobotPoseTargetSpace().getPosition();
-
-                    telemetry.addData("Limelight", "Target ID: " + id);
-                    telemetry.addData("Limelight", "Side-to-Side Distance: " + position.x);
-                    telemetry.addData("Limelight", "Vertical Distance: " + position.y);
-                    telemetry.addData("Limelight", "Orthogonal Distance: " + position.z);
-                    telemetry.addData("Limelight", "Total distance: " + Math.sqrt(Math.pow(position.x, 2) + Math.pow(position.y, 2) + Math.pow(position.z, 2)));
-                    telemetry.update();
-
-                }
+            if (gamepad1.bWasPressed()) {
+                m_intake.setPower(0.7);
             } else {
-                telemetry.addData("Limelight", "No Targets");
+                m_intake.setPower(0);
+            }
+
+            if (gamepad1.xWasPressed()){
+                m_shooter.setPower(-0.85);
+            }
+
+            if (gamepad1.aWasPressed()) {
+                m_transfer.setPosition(0);
+                m_intake.setPower(-0.4);
             }
             // Show the elapsed game time and wheel power.
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
     }
-}
+    }
+
