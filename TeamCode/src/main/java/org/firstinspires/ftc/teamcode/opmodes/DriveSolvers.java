@@ -72,9 +72,6 @@ public class DriveSolvers extends CommandOpMode {
                 ()->{return driverOp.getRightX() * 0.7;}
                 );
         SequentialCommandGroup m_threeBallShoot = new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    m_shooter.setServos(m_shooter.servoLeft.getPosition() - 0.2);
-                }),
                 //shoot first one
                 new InstantCommand(m_transfer::shoot_position),
                 new WaitCommand(400),
