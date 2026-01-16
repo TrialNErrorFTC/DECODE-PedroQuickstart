@@ -17,7 +17,7 @@ import kotlin.time.Instant;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    DcMotor motor_intake;
+   public DcMotor motor_intake;
     public IntakeSubsystem(HardwareMap hMap){
         motor_intake = hMap.get(DcMotor.class, "motorI");
         motor_intake.setMode(RUN_WITHOUT_ENCODER);

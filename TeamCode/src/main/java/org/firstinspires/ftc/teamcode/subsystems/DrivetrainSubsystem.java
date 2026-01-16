@@ -9,7 +9,6 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class DrivetrainSubsystem extends SubsystemBase {
-    private final IMU imu;
     public DcMotor frontLeft, frontRight, backLeft, backRight;
    public DrivetrainSubsystem(HardwareMap hardwareMap){
        //initialize all motors with hardware map
@@ -17,18 +16,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
        frontRight = hardwareMap.get(DcMotor.class, "motorFR");
        backLeft = hardwareMap.get(DcMotor.class, "motorBL");
        backRight = hardwareMap.get(DcMotor.class, "motorBR");
-
-       //initialize imu with hardware map
-       imu = hardwareMap.get(IMU.class, "imu");
-
-       imu.initialize(
-               new IMU.Parameters(
-                       new RevHubOrientationOnRobot(
-                               RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                               RevHubOrientationOnRobot.UsbFacingDirection.UP
-                       )
-               )
-       );
 
 
        //Reverse the left side motors
@@ -45,7 +32,4 @@ public class DrivetrainSubsystem extends SubsystemBase {
    }
 
 
-   public double getHeading(){
-       return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-   }
 }

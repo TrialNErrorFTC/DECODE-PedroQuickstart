@@ -10,7 +10,7 @@ import dev.nextftc.hardware.impl.ServoEx;
 import dev.nextftc.hardware.positionable.SetPosition;
 
 public class TransferSubsystem extends SubsystemBase {
-    Servo servo_transfer;
+    public Servo servo_transfer;
     public TransferSubsystem(HardwareMap hMap){
         servo_transfer = hMap.get(Servo.class, "servoTransfer");
     }

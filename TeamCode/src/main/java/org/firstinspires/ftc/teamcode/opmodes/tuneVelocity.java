@@ -34,11 +34,11 @@ public class tuneVelocity extends LinearOpMode {
 
         Servo intakeServo = hardwareMap.get(Servo.class, "servoTransfer");
 
-        shooterMotor.setRunMode(Motor.RunMode.RawPower);
+        shooterMotor.setRunMode(Motor.RunMode.VelocityControl);
         shooterMotor.setInverted(true);
         waitForStart();
         while (opModeIsActive()) {
-            shooterMotor.set(0.85);
+            shooterMotor.set(0.75);
             shooterMotor.getVelocity();
 
 //            intakeMotor.setPower(1.0);
