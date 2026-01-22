@@ -30,7 +30,7 @@ public class tuneVelocity extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        MotorEx shooterMotor = new MotorEx(hardwareMap, "shooterMotor", Motor.GoBILDA.BARE);
+        MotorEx shooterMotor = new MotorEx(hardwareMap, "motorS", Motor.GoBILDA.BARE);
 
         Servo intakeServo = hardwareMap.get(Servo.class, "servoTransfer");
 
@@ -38,8 +38,9 @@ public class tuneVelocity extends LinearOpMode {
         shooterMotor.setInverted(true);
         waitForStart();
         while (opModeIsActive()) {
-            shooterMotor.set(0.75);
-            shooterMotor.getVelocity();
+            shooterMotor.set(1.0);
+            telemetry.addData("Shooter Motor",shooterMotor.getVelocity());
+            telemetry.update();
 
 //            intakeMotor.setPower(1.0);
         }

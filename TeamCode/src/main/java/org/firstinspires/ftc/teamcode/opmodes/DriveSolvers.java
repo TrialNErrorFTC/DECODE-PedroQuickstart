@@ -4,8 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.PerpetualCommand;
 import com.seattlesolvers.solverslib.command.RepeatCommand;
+import com.seattlesolvers.solverslib.command.ScheduleCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.button.Button;
@@ -32,39 +34,30 @@ import org.firstinspires.ftc.teamcode.subsystems.TransferSubsystem;
 @TeleOp
 public class DriveSolvers extends CommandOpMode {
 
+    private ShooterSubsystem m_shooter;
+    private IntakeSubsystem m_intake;
+    private TransferSubsystem m_transfer;
+    private DrivetrainSubsystem m_drivetrain;
+    private LimelightSubsystem m_limelight;
+
     /**
      * This method is executed once when the OpMode is initialized.
      * It handles the setup of all necessary components for driver control,
      * such as subsystems and button bindings for commands.
      */
+
+
     @Override
     public void initialize() {
         GamepadEx driverOp = new GamepadEx(gamepad1);
-        ShooterSubsystem m_shooter = new ShooterSubsystem(hardwareMap);
-        IntakeSubsystem m_intake = new IntakeSubsystem(hardwareMap);
-        TransferSubsystem m_transfer = new TransferSubsystem(hardwareMap);
-        DrivetrainSubsystem m_drivetrain = new DrivetrainSubsystem(hardwareMap);
-        LimelightSubsystem m_limelight = new LimelightSubsystem(hardwareMap);
+        m_shooter = new ShooterSubsystem(hardwareMap);
+        m_intake = new IntakeSubsystem(hardwareMap);
+        m_transfer = new TransferSubsystem(hardwareMap);
+        m_drivetrain = new DrivetrainSubsystem(hardwareMap);
 
         InstantCommand m_initialize = new InstantCommand(m_shooter::initializeServos);
         InstantCommand m_offCommand = new InstantCommand(m_transfer::off_position);
 
-        InstantCommand m_distanceFromAprilTag = new InstantCommand(() -> {
-            if(m_limelight.hasValidTarget()){
-                Position position = m_limelight.getDistanceFromAprilTag();
-                Pose3D botpose = m_limelight.getBotpose();
-                telemetry.addData("X from camera", position.x);
-                telemetry.addData("Y from camera", position.y);
-                telemetry.addData("Z from camera", position.z);
-                telemetry.addData("Botpose X", botpose.getPosition().x);
-                telemetry.addData("Botpose Y", botpose.getPosition().y);
-                telemetry.addData("distance", Math.sqrt(Math.pow(botpose.getPosition().x, 2) + Math.pow(botpose.getPosition().y, 2)));
-                telemetry.update();
-            } else {
-                telemetry.addLine("Limelight: No Targets");
-                telemetry.update();
-            }
-        });
 
         DefaultDrive m_driveCommand = new DefaultDrive(m_drivetrain,
                 ()->{return driverOp.getLeftY() * 0.7;},
@@ -157,10 +150,12 @@ public class DriveSolvers extends CommandOpMode {
         //Binds the 'Right Bumper' button to a command that runs the intake.
         Button intakeButton = new GamepadButton(
                 driverOp, GamepadKeys.Button.RIGHT_BUMPER
-        ).whenPressed(new InstantCommand(
-                m_intake::forward
-        )).whenReleased(new InstantCommand(
-                m_intake::stop
+        ).whenPressed(new ScheduleCommand(
+                new InstantCommand(m_intake::forward),
+                new InstantCommand(m_transfer::transfer)
+        )).whenReleased(new ScheduleCommand(
+                new InstantCommand(m_intake::stop),
+                new InstantCommand(m_transfer::stop)
         ));
 
 //        //Binds the 'Left Bumper' button to a command that moves the transfer to the shoot position.
@@ -171,16 +166,36 @@ public class DriveSolvers extends CommandOpMode {
         )).whenReleased(new InstantCommand(
                 m_transfer::off_position
         ));
-
-        Command m_telemtry = new RepeatCommand(
-                new InstantCommand(() -> {
-                    telemetry.addData("Shooter Position", m_shooter.servoRight.getPosition());
-                    telemetry.addData("Transfer Position", m_transfer.servo_transfer.getPosition());
-                })
-        );
+//        Button increaseFlywheelSpeed = new GamepadButton(
+//                driverOp, GamepadKeys.Button.DPAD_LEFT
+//        ).whenPressed(
+//                new InstantCommand(
+//                        ()-> {
+//                            m_shooter.motorShooter.set(m_shooter.motorShooter.get() + 0.1);
+//                        }
+//                )
+//        );
+//        Button decreaseFlywheelSpeed = new GamepadButton(
+//                driverOp, GamepadKeys.Button.DPAD_RIGHT
+//        ).whenPressed(
+//                new InstantCommand(
+//                        ()-> {
+//                            m_shooter.motorShooter.set(m_shooter.motorShooter.get() - 0.1);
+//                        }
+//                )
+//        );
 
         Button shootButton2 = new GamepadButton(
                 driverOp, GamepadKeys.Button.X
         ).toggleWhenPressed(m_threeBallShoot);
+    }
+    public void run(){
+        super.run();
+
+        telemetry.addData("Shooter Velocity", m_shooter.motorShooter.getVelocity() * 60/28);
+        telemetry.addData("Shooter Position", m_shooter.servoRight.getPosition());
+        telemetry.addData("Transfer Position", m_transfer.servo_transfer.getPosition());
+        telemetry.addData("Shooter Power", m_shooter.motorShooter.getVelocity());
+        telemetry.update();
     }
 }

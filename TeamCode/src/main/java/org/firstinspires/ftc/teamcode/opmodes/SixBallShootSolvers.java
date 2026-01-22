@@ -87,7 +87,6 @@ public class SixBallShootSolvers extends CommandOpMode {
         ShooterSubsystem m_shooter = new ShooterSubsystem(hardwareMap);
         IntakeSubsystem m_intake = new IntakeSubsystem(hardwareMap);
         TransferSubsystem m_transfer = new TransferSubsystem(hardwareMap);
-        LimelightSubsystem m_limelight = new LimelightSubsystem(hardwareMap);
 
         InstantCommand m_initialize = new InstantCommand(m_shooter::initializeServos);
         InstantCommand m_offCommand = new InstantCommand(m_transfer::off_position);

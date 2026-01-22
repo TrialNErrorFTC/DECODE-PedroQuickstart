@@ -2,28 +2,36 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODERS;
 
+import com.qualcomm.hardware.motors.GoBILDA5201Series;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class ShooterSubsystem extends SubsystemBase {
     public Servo servoLeft, servoRight;
-    DcMotorEx motorShooter;
+    public DcMotorEx motorShooter;
     public ShooterSubsystem(final HardwareMap hMap){
+        //initalize servo
         servoLeft = hMap.get(Servo.class, "servoLeft");
         servoRight = hMap.get(Servo.class, "servoRight");
+
         motorShooter = hMap.get(DcMotorEx.class, "motorS");
-        motorShooter.setMode(RUN_WITHOUT_ENCODER);
+        motorShooter.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(161.5,0,0,15.9));
+
+        motorShooter.setDirection(DcMotorSimple.Direction.REVERSE);
+
         servoLeft.setDirection(Servo.Direction.REVERSE);
         servoRight.setDirection(Servo.Direction.FORWARD);
-        motorShooter.setDirection(DcMotorSimple.Direction.REVERSE);
+
     }
     public void setServos(double angle){
         servoLeft.setPosition(angle);
@@ -35,11 +43,17 @@ public class ShooterSubsystem extends SubsystemBase {
         setServos(1);
     }
     public void highSpeed(){
-        motorShooter.setPower(0.5);
+        motorShooter.setVelocity((double) (2142 * 28) /60);
     }
-    public void lowSpeed(){motorShooter.setPower(0.3); }
+    public void lowSpeed(){
+        motorShooter.setVelocity((double) (1071 * 28)/60);
+    }
+
+    public void setSpeed(){
+
+    }
 
     public void stop(){
-        motorShooter.setPower(0);
+        motorShooter.setVelocity(0);
     }
 }
