@@ -23,7 +23,13 @@ public class driveTrainTestSolvers extends CommandOpMode {
         TransferSubsystem m_transfer = new TransferSubsystem(hardwareMap);
         DrivetrainSubsystem m_drivetrain = new DrivetrainSubsystem(hardwareMap);
 
-        DefaultDrive m_driveCommand = new DefaultDrive(m_drivetrain, ()->{return 0.6;},()->{return 0;}, ()->{return 0;});
+        DefaultDrive m_driveCommand = new DefaultDrive(m_drivetrain, () -> {
+            return 0.6;
+        }, () -> {
+            return 0;
+        }, () -> {
+            return 0;
+        });
 
 
         Button shootButton2 = new GamepadButton(

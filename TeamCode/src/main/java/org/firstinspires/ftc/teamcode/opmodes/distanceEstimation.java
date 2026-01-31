@@ -62,9 +62,10 @@ import dev.nextftc.core.units.Distance;
 @TeleOp
 public class distanceEstimation extends LinearOpMode {
     Limelight3A limelight;
+
     @Override
     public void runOpMode() {
-        while (opModeInInit()){
+        while (opModeInInit()) {
             limelight = hardwareMap.get(Limelight3A.class, "limelight");
             limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
             limelight.start(); // This tells Limelight to start looking!

@@ -25,7 +25,7 @@ public class ShooterSubsystem extends SubsystemBase {
         servoRight = hMap.get(Servo.class, "servoRight");
 
         motorShooter = hMap.get(DcMotorEx.class, "motorS");
-        motorShooter.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(161.5,0,0,15.9));
+        motorShooter.setPIDFCoefficients(RUN_USING_ENCODER, new PIDFCoefficients(60.598,0,0,16.378));
 
         motorShooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -43,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
         setServos(1);
     }
     public void highSpeed(){
-        motorShooter.setVelocity((double) (2142 * 28) /60);
+        motorShooter.setVelocity((double) (2100 * 28) /60);
     }
     public void lowSpeed(){
         motorShooter.setVelocity((double) (1071 * 28)/60);

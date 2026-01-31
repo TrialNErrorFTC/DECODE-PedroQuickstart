@@ -52,7 +52,7 @@ import dev.nextftc.core.units.Angle;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
+@TeleOp(name = "Basic: Linear OpMode", group = "Linear OpMode")
 public class ServoTest extends LinearOpMode {
 
     // Declare OpMode members.
@@ -80,11 +80,13 @@ public class ServoTest extends LinearOpMode {
             setServos(Angle.fromDeg(-30));
         }
     }
-    public void initializeServos(){
+
+    public void initializeServos() {
         servoLeft.setPosition(Angle.fromDeg(0).inRev);
         servoRight.setPosition(Angle.fromDeg(0).inRev);
     }
-    public void setServos(Angle angle){
+
+    public void setServos(Angle angle) {
         servoLeft.setPosition(angle.inRev);
         servoRight.setPosition(angle.inRev);
 

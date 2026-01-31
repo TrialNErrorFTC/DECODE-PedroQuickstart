@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.telemetry.PanelsTelemetry;
+
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
@@ -35,6 +36,7 @@ public class SixBallShoot extends OpMode {
     public static Pose shoot1Pose = new Pose(57.69033760186264, 84.52968568102445, Math.toRadians(135));
 
     public Pose score1Pose;
+
     @Override
     public void init() {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -61,7 +63,7 @@ public class SixBallShoot extends OpMode {
     @Override
     public void loop() {
         follower.update(); // Update Pedro Pathing
-         autonomousPathUpdate(); // Update autonomous state machine
+        autonomousPathUpdate(); // Update autonomous state machine
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
@@ -77,7 +79,6 @@ public class SixBallShoot extends OpMode {
         public PathChain Path2;
         public PathChain Path4;
         public PathChain Path3;
-
 
 
         public Paths(Follower follower) {
@@ -99,9 +100,9 @@ public class SixBallShoot extends OpMode {
 
                     .build();
 
-            Path4 = follower.pathBuilder().addPath( new BezierLine(
+            Path4 = follower.pathBuilder().addPath(new BezierLine(
                                     pickup1StartPose,
-                    pickup1EndPose
+                                    pickup1EndPose
 
                             )
                     ).setTangentHeadingInterpolation()
@@ -141,7 +142,7 @@ public class SixBallShoot extends OpMode {
 //            */
 //
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-                if(!follower.isBusy()) {
+                if (!follower.isBusy()) {
                     /* Score Preload */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
@@ -209,7 +210,9 @@ public class SixBallShoot extends OpMode {
         }
     }
 
-    /** These change the states of the paths and actions. It will also reset the timers of the individual switches **/
+    /**
+     * These change the states of the paths and actions. It will also reset the timers of the individual switches
+     **/
     public void setPathState(int pState) {
         pathState = pState;
         pathTimer.resetTimer();

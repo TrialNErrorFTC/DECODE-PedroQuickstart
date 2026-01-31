@@ -10,21 +10,22 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 
-@TeleOp(name="Velocity Tuner for shooter", group="Tuning")
+@TeleOp(name = "Velocity Tuner for shooter", group = "Tuning")
 public class tuneVelocity extends LinearOpMode {
 
     private static double kP = 0;
     private static double kI = 0;
     private static double kD = 0;
 
-    private double getkP(){
+    private double getkP() {
         return kP;
     }
 
-    private double getkI(){
+    private double getkI() {
         return kI;
     }
-    private double getkD(){
+
+    private double getkD() {
         return kD;
     }
 
@@ -39,7 +40,7 @@ public class tuneVelocity extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             shooterMotor.set(1.0);
-            telemetry.addData("Shooter Motor",shooterMotor.getVelocity());
+            telemetry.addData("Shooter Motor", shooterMotor.getVelocity());
             telemetry.update();
 
 //            intakeMotor.setPower(1.0);

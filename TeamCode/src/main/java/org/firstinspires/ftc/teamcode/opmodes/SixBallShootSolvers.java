@@ -43,6 +43,7 @@ public class SixBallShootSolvers extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);
     //Poses
+
     public static Pose startPose = new Pose(12.763678696158333, 130.6298020954598, Math.toRadians(135));
     public static Pose preloadPose = new Pose(23.310826542491252, 120.32130384167635, Math.toRadians(135));
     public static Pose pickup1StartPose = new Pose(40.618, 83.299, Math.toRadians(180));

@@ -12,12 +12,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import java.util.List;
 
 public class LimelightSubsystem extends SubsystemBase {
-    Limelight3A limelight;
-    LLResult result;
+    public Limelight3A limelight;
+    public LLResult result;
     public LimelightSubsystem(HardwareMap hMap){
         limelight = hMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(0);
+        limelight.pipelineSwitch(1);
         limelight.start();
     }
 
@@ -39,11 +39,6 @@ public class LimelightSubsystem extends SubsystemBase {
         return botpose;
     }
 
-    public Pose3D getBotpose_M2(){
-        result = limelight.getLatestResult();
-        Pose3D botpose_mt2 = result.getBotpose_MT2();
-        return botpose_mt2;
-    }
     public double getTx(){
         result = limelight.getLatestResult();
         return result.getTx();
