@@ -2,12 +2,21 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
-public class ShooterAdjust extends SubsystemBase {
-    public ShooterAdjust(){
+import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 
+public class ShooterAdjust extends SubsystemBase {
+    private final RobotHardware robot;
+
+    public ShooterAdjust() {
+        robot = RobotHardware.get();
     }
 
-    public void periodic(){
+    public void initializeServos() {
+        setServos(1);
+    }
 
+    private void setServos(int angle) {
+        robot.servoLeft.set(angle);
+        robot.servoRight.set(angle);
     }
 }

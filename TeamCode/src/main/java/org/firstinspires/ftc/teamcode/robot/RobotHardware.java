@@ -10,60 +10,70 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterAdjust;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 
 public class RobotHardware {
     private static final RobotHardware instance = new RobotHardware();
+    public ShooterAdjust shooterAdjust;
+
     public static enum Alliance {
         BLUE,
         RED
     }
+
     public static Alliance alliance;
     private Limelight3A limelight;
     public MotorEx shooterMotor;
     public MotorEx intakeMotor;
-    private ServoEx servoLeft;
-    private ServoEx servoRight;
-    private ServoEx servoTransferShooter;
-    private CRServoEx servoTransferIntake;
+    public ServoEx servoLeft;
+    public ServoEx servoRight;
+    public ServoEx servoTransferShooter;
+    public CRServoEx servoTransferIntake;
     public JoinedTelemetry flightRecorder;
-    private Intake intake;
+    public Intake intake;
     private Shooter shooter;
-    private Transfer transfer;
+    public Transfer transfer;
+    public MecanumDrive drive;
 
-    public RobotHardware(){}
+    public RobotHardware() {
+    }
 
 
     /**
      * Return instance of RobotHardware
+     *
      * @return RobotHardware
      */
-    public static RobotHardware get(){
+    public static RobotHardware get() {
         return instance;
     }
 
-    public void reset(){}
+    public void reset() {
+    }
 
     /**
-    * Instantiates all hardware and creates all subsystems
-     * @param map hardwareMap to initialize with
+     * Instantiates all hardware and creates all subsystems
+     *
+     * @param map       hardwareMap to initialize with
      * @param telemetry telemetry to use
-     * @param runtime timer to use
      * @return RobotHardware
-    **/
-    public RobotHardware init(HardwareMap map, Telemetry telemetry, ElapsedTime runtime){
+     **/
+    public RobotHardware init(HardwareMap map, Telemetry telemetry, Pose pose) {
         //instantiate all hardware
 
         //shooter motor
-        shooterMotor = new MotorEx(map, "MotorS");
-        intakeMotor = new MotorEx(map, "MotorI");
+        shooterMotor = new MotorEx(map, "motorS");
+        intakeMotor = new MotorEx(map, "motorI");
         shooterMotor.setInverted(true);
 
         servoLeft = new ServoEx(map, "servoLeft");
@@ -85,20 +95,26 @@ public class RobotHardware {
         intake = new Intake();
         shooter = new Shooter();
         transfer = new Transfer();
-
+        shooterAdjust = new ShooterAdjust();
+        drive = new MecanumDrive(map, pose);
         return this;
     }
 
-    /** Returns Voltage Compensation Ratio to multiply with (prolly not needed)
-     * **/
-public double getVoltageFeedforwardConstant(){
-    return 0;
-}
+    /**
+     * Returns Voltage Compensation Ratio to multiply with (prolly not needed)
+     *
+     **/
+    public double getVoltageFeedforwardConstant() {
+        return 0;
+    }
 
-public void endLoop(){
-    //show alliance
-    // show battery
-    //run the scheduler
-    // update telemetry
-}
+    public void endLoop() {
+        //show alliance
+        flightRecorder.addData("ALLIANCE", alliance);
+        // show battery
+        //run the scheduler
+        CommandScheduler.getInstance().run();
+        // update telemetry
+        flightRecorder.update();
+    }
 }
