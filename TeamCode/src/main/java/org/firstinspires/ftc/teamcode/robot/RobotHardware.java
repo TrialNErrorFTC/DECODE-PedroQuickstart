@@ -1,0 +1,104 @@
+package org.firstinspires.ftc.teamcode.robot;
+
+import android.provider.Settings;
+
+import com.bylazar.telemetry.JoinedTelemetry;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+
+public class RobotHardware {
+    private static final RobotHardware instance = new RobotHardware();
+    public static enum Alliance {
+        BLUE,
+        RED
+    }
+    public static Alliance alliance;
+    private Limelight3A limelight;
+    public MotorEx shooterMotor;
+    public MotorEx intakeMotor;
+    private ServoEx servoLeft;
+    private ServoEx servoRight;
+    private ServoEx servoTransferShooter;
+    private CRServoEx servoTransferIntake;
+    public JoinedTelemetry flightRecorder;
+    private Intake intake;
+    private Shooter shooter;
+    private Transfer transfer;
+
+    public RobotHardware(){}
+
+
+    /**
+     * Return instance of RobotHardware
+     * @return RobotHardware
+     */
+    public static RobotHardware get(){
+        return instance;
+    }
+
+    public void reset(){}
+
+    /**
+    * Instantiates all hardware and creates all subsystems
+     * @param map hardwareMap to initialize with
+     * @param telemetry telemetry to use
+     * @param runtime timer to use
+     * @return RobotHardware
+    **/
+    public RobotHardware init(HardwareMap map, Telemetry telemetry, ElapsedTime runtime){
+        //instantiate all hardware
+
+        //shooter motor
+        shooterMotor = new MotorEx(map, "MotorS");
+        intakeMotor = new MotorEx(map, "MotorI");
+        shooterMotor.setInverted(true);
+
+        servoLeft = new ServoEx(map, "servoLeft");
+        servoRight = new ServoEx(map, "servoRight");
+        servoLeft.setInverted(true);
+
+        servoTransferShooter = new ServoEx(map, "servoTransfer");
+        servoTransferIntake = new CRServoEx(map, "servoTransfer2");
+        servoTransferIntake.setInverted(true);
+
+
+        limelight = map.get(Limelight3A.class, "limelight");
+
+
+        flightRecorder = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
+        //TODO: Set Up Telemetry
+
+        //create all subsystems
+        intake = new Intake();
+        shooter = new Shooter();
+        transfer = new Transfer();
+
+        return this;
+    }
+
+    /** Returns Voltage Compensation Ratio to multiply with (prolly not needed)
+     * **/
+public double getVoltageFeedforwardConstant(){
+    return 0;
+}
+
+public void endLoop(){
+    //show alliance
+    // show battery
+    //run the scheduler
+    // update telemetry
+}
+}
