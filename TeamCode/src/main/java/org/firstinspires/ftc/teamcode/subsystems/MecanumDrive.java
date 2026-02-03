@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.MathFunctions;
 import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -14,6 +15,7 @@ public class MecanumDrive extends SubsystemBase {
     private static final double TURRET_OFFSET = 2.0599;
     public static double PREDICT_FACTOR = 0.35;
     RobotHardware robot = RobotHardware.get();
+    private Pose aimAtPose;
 
     public static class AimAtTarget {
         public double distance;
@@ -46,11 +48,14 @@ public class MecanumDrive extends SubsystemBase {
         robot.flightRecorder.addLine("======DRIVETRAIN:=======");
         robot.flightRecorder.addData("goal heading", lastAimTarget.heading);
         robot.flightRecorder.addData("goal distance", lastAimTarget.distance);
+        robot.flightRecorder.addData("goal x", aimAtPose.getX());
+        robot.flightRecorder.addData("goal y", aimAtPose.getY());
 
         robot.flightRecorder.addData("X:", lastPose.getX());
         robot.flightRecorder.addData("Y:", lastPose.getY());
         robot.flightRecorder.addData("Heading", Math.toDegrees(lastPose.getHeading()));
 
+        robot.flightRecorder.addData("Heading Error", getHeadingError());
         follower.update();
     }
 
@@ -118,7 +123,6 @@ public class MecanumDrive extends SubsystemBase {
         Pose currPose = getPose();
 
         // aim logic to help prevent undershoot on the edge of the top tiles
-        Pose aimAtPose;
         if (currPose.getY() > 72.0 && RobotHardware.alliance == RobotHardware.Alliance.BLUE) {
             aimAtPose = new Pose(7, 144 - 7);
         } else if (currPose.getY() > 72.0 && RobotHardware.alliance == RobotHardware.Alliance.RED) {
@@ -126,6 +130,7 @@ public class MecanumDrive extends SubsystemBase {
         } else {
             aimAtPose = chosenPose;
         }
+
 
         double distance = chosenPose.distanceFrom(chosenPose) / 12.0;
 
@@ -136,5 +141,14 @@ public class MecanumDrive extends SubsystemBase {
 
         double angleToTarget = Math.toDegrees(absAngleToTarget);
         return new AimAtTarget(distance, angleToTarget);
+    }
+    private double getHeadingError(){
+        if (follower.getCurrentPath() == null){
+            return 0;
+        }
+
+        double headingError = MathFunctions.getTurnDirection(follower.getPose().getHeading(),lastAimTarget.heading)
+                * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), lastAimTarget.heading);
+        return headingError;
     }
 }

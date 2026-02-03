@@ -108,9 +108,13 @@ public class RobotHardware {
         return 0;
     }
 
+
+    /**
+     * Main Loop Code for Running OpModes
+    * */
     public void endLoop() {
         //show alliance
-        flightRecorder.addData("ALLIANCE", alliance);
+        flightRecorder.addData("ALLIANCE", alliance.toString());
         // show battery
         //run the scheduler
         CommandScheduler.getInstance().run();
