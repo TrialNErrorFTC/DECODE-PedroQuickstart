@@ -140,7 +140,6 @@ public class MecanumDrive extends SubsystemBase {
         );
 
         double angleToTarget = Math.toDegrees(absAngleToTarget);
-        follower.getHeading();
         return new AimAtTarget(distance, angleToTarget);
     }
     private double getHeadingError(){
@@ -148,8 +147,8 @@ public class MecanumDrive extends SubsystemBase {
             return 0;
         }
 
-        double headingError = MathFunctions.getTurnDirection(follower.getPose().getHeading(),lastAimTarget.heading)
-                * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), lastAimTarget.heading);
+        double headingError = MathFunctions.getTurnDirection(follower.getPose().getHeading(),Math.toRadians(lastAimTarget.heading))
+                * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), Math.toRadians(lastAimTarget.heading));
         return headingError;
     }
 }
