@@ -116,7 +116,7 @@ public class MecanumDrive extends SubsystemBase {
 
     public AimAtTarget getAimTarget() {
         return lastAimTarget;
-   }
+    }
 
     private AimAtTarget getShooterPositionPinpointRel2() {
         Pose chosenPose = RobotHardware.alliance == RobotHardware.Alliance.BLUE ? blueGoalPose : redGoalPose;
@@ -140,6 +140,7 @@ public class MecanumDrive extends SubsystemBase {
         );
 
         double angleToTarget = Math.toDegrees(absAngleToTarget);
+        follower.getHeading();
         return new AimAtTarget(distance, angleToTarget);
     }
     private double getHeadingError(){
