@@ -13,29 +13,45 @@ import org.firstinspires.ftc.teamcode.utilities.RunningAverageFilter;
 
 @Configurable
 public class Shooter extends SubsystemBase {
+    public static double kS = 0.0;
+
     public enum Mode {
         RAW,
         FIXED,
         DYNAMIC
     }
 
-    public static boolean tuning = false;
+    public static boolean tuning = true;
     public static Mode mode = Mode.RAW;
     private final RunningAverageFilter velFilter = new RunningAverageFilter(5);
 
     public static double targetVelocityTicks = 0.0;
     public static double targetRawPower = 0.0;
 
-    public static double IDLE_VELOCITY = -600.0;
-    public static double kV = 0.0005118;
-    public static double kP = 0.0035;
+    public static double IDLE_VELOCITY = 0;
+    public static double kV = 0.0;
+    public static double kP = 0.0;
     public static double kI = 0.0;
-    public static double kD = 0.0004;
+    public static double kD = 0.0;
     public static double VELOCITY_TOLERANCE = 40.0;
     public static double CLOSE_ZONE_OFFSET = 0.0;
     public static double FAR_ZONE_OFFSET = 0.0;
 
-    private final PIDFController flywheelVelocityPID = new PIDFController(kP, kI, kD, 0);
+
+    private final com.seattlesolvers.solverslib.controller.PIDFController flywheelVelocityPID = new PIDFController(kP, kI, kD, 0);
+
+    private double getKD() {
+        return kD;
+    }
+
+    private double getKI() {
+        return kI;
+    }
+
+    public double getKP() {
+        return kP;
+    }
+
     RobotHardware robot = RobotHardware.get();
 
     // initialize this thing to persist as is
@@ -66,7 +82,6 @@ public class Shooter extends SubsystemBase {
 //    }
 
     public Shooter() {
-        flywheelVelocityPID.setTolerance(VELOCITY_TOLERANCE);
     }
 
     @Override
@@ -98,7 +113,10 @@ public class Shooter extends SubsystemBase {
     public void setMode(Mode mode) {
         Shooter.mode = mode;
     }
-    public Mode getMode() { return mode; }
+
+    public Mode getMode() {
+        return mode;
+    }
 
 //    public double getOptimalVelocityForDist(double distance_ft) {
 //        return distToVeloLUT.get(distance_ft);
@@ -120,17 +138,26 @@ public class Shooter extends SubsystemBase {
 
     private void velocityMode() {
         if (tuning) {
-            flywheelVelocityPID.setPIDF(kP, kI, kD, 0);
+            flywheelVelocityPID.setPIDF(getKP(), getKI(), getKD(), 0);
             flywheelVelocityPID.setTolerance(VELOCITY_TOLERANCE);
         }
 
         double currentVelocity = velFilter.getFilteredOutput();
         // voltage comp is necessary to prevent the bot from tweaking towards the end of the match
-        double output = flywheelVelocityPID.calculate(currentVelocity, targetVelocityTicks) * robot.getVoltageFeedforwardConstant() +
-                kV * targetVelocityTicks * robot.getVoltageFeedforwardConstant();
+        double output = flywheelVelocityPID.calculate(currentVelocity, targetVelocityTicks) +
+                getKV() * targetVelocityTicks + getKS();
 
         robot.shooterMotor.set(output);
     }
+
+    private double getKS() {
+        return kS;
+    }
+
+    private double getKV() {
+        return kV;
+    }
+
 
 //    private void dynamicMode() {
 //        double currentVelocity = velFilter.getFilteredOutput();
@@ -154,8 +181,8 @@ public class Shooter extends SubsystemBase {
         robot.flightRecorder.addData("Flywheel raw power output", robot.shooterMotor.get());
     }
 
-    public boolean isAtTargetVelocity() {
-        return flywheelVelocityPID.atSetPoint();
-    }
+//    public boolean isAtTargetVelocity() {
+//        return flywheelVelocityPID.atSetPoint();
+//    }
 
 }

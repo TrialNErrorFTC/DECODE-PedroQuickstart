@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 
 @TeleOp(name = "DriveTrain TeleOp")
 public class DriveTeleOp extends OpMode {
+    public static double TARGET_VELOCITY = 0.0;
     private GamepadEx gamepad1Ex;
     private RobotHardware robot;
 
@@ -41,7 +42,7 @@ public class DriveTeleOp extends OpMode {
 
         CommandScheduler.getInstance().schedule(new SequentialCommandGroup(run(() -> robot.shooterAdjust.initializeServos()), run(() -> robot.transfer.off_position())));
 
-        bind(GamepadKeys.Button.A, new TurnCommand(robot.drive.follower, Math.toRadians(robot.drive.lastAimTarget.heading), MathFunctions.getTurnDirection(robot.drive.lastPose.getHeading(), Math.toRadians(robot.drive.lastAimTarget.heading)) == 1), new InstantCommand());
+//        bind(GamepadKeys.Button.A, new TurnCommand(robot.drive.follower, Math.toRadians(robot.drive.lastAimTarget.heading), MathFunctions.getTurnDirection(robot.drive.lastPose.getHeading(), Math.toRadians(robot.drive.lastAimTarget.heading)) == 1), new InstantCommand());
         bind(GamepadKeys.Button.B, new InstantCommand(() -> {
             headingLock = !headingLock;
         }), new InstantCommand());
@@ -50,7 +51,7 @@ public class DriveTeleOp extends OpMode {
             robot.shooter.setVelocity(1500);
         }), new InstantCommand());
         bind(GamepadKeys.Button.DPAD_LEFT, new InstantCommand(() -> {
-            robot.shooter.setVelocity(robot.shooter.targetVelocityTicks + 50);
+
         }), new InstantCommand());
         bind(GamepadKeys.Button.DPAD_RIGHT, new InstantCommand(() -> {
             robot.shooter.setVelocity(robot.shooter.targetVelocityTicks - 50);
@@ -61,6 +62,7 @@ public class DriveTeleOp extends OpMode {
     public void loop() {
         controller.setCoefficients(robot.drive.follower.constants.coefficientsHeadingPIDF);
         controller.updateError(robot.drive.getHeadingError());
+        robot.shooter.setVelocity(getTargetVelocity());
         robot.endLoop();
 
         if (headingLock) {
@@ -68,6 +70,10 @@ public class DriveTeleOp extends OpMode {
         } else {
             robot.drive.setTeleOpDrive(gamepad1Ex.getLeftY(), -gamepad1Ex.getLeftX(), -gamepad1Ex.getRightX());
         }
+    }
+
+    private double getTargetVelocity() {
+        return TARGET_VELOCITY;
     }
 
     /**

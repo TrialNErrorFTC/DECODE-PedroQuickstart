@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
@@ -35,6 +36,7 @@ public class RobotHardware {
         BLUE,
         RED
     }
+
     public VoltageSensor batterySensor;
     private final BasicFilter batteryFilter = new RunningAverageFilter(5);
     public static Alliance alliance;
@@ -105,6 +107,7 @@ public class RobotHardware {
         intake = new Intake();
         shooter = new Shooter();
         shooter.setMode(Shooter.Mode.FIXED);
+        shooterMotor.setRunMode(Motor.RunMode.RawPower);
         transfer = new Transfer();
         shooterAdjust = new ShooterAdjust();
         drive = new MecanumDrive(map, pose);
@@ -124,7 +127,8 @@ public class RobotHardware {
 
     /**
      * Main Loop Code for Running OpModes
-    * */
+     *
+     */
     public void endLoop() {
         //show alliance
         flightRecorder.addData("ALLIANCE", alliance.toString());
