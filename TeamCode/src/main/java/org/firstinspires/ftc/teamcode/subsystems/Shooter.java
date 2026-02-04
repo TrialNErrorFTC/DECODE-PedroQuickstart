@@ -137,10 +137,6 @@ public class Shooter extends SubsystemBase {
     }
 
     private void velocityMode() {
-        if (tuning) {
-            flywheelVelocityPID.setPIDF(getKP(), getKI(), getKD(), 0);
-            flywheelVelocityPID.setTolerance(VELOCITY_TOLERANCE);
-        }
 
         double currentVelocity = velFilter.getFilteredOutput();
         // voltage comp is necessary to prevent the bot from tweaking towards the end of the match

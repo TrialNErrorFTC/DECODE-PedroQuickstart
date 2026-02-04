@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.run;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.PIDFController;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.MathFunctions;
@@ -19,6 +20,7 @@ import com.seattlesolvers.solverslib.pedroCommand.TurnCommand;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 
+@Configurable
 @TeleOp(name = "DriveTrain TeleOp")
 public class DriveTeleOp extends OpMode {
     public static double TARGET_VELOCITY = 0.0;
