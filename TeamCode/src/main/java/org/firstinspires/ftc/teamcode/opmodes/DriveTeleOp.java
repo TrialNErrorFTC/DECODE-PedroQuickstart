@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.run;
 
+import com.pedropathing.control.PIDFController;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -21,6 +22,7 @@ public class DriveTeleOp extends OpMode {
     private RobotHardware robot;
 
     private boolean headingLock = false;
+    private PIDFController controller;
 
     @Override
     public void init() {
@@ -31,20 +33,27 @@ public class DriveTeleOp extends OpMode {
         robot.drive.follower.startTeleOpDrive();
         gamepad1Ex = new GamepadEx(gamepad1);
 
+        controller = new PIDFController(robot.drive.follower.constants.coefficientsHeadingPIDF);
+
         CommandScheduler.getInstance().schedule(new SequentialCommandGroup(
                 run(() -> robot.shooterAdjust.initializeServos()),
                 run(() -> robot.transfer.off_position()))
         );
+        bindToggle(GamepadKeys.Button.A, run(() -> {
+            headingLock = !headingLock;
+        }));
     }
 
     @Override
     public void loop() {
+        controller.setCoefficients(robot.drive.follower.constants.coefficientsHeadingPIDF);
+        controller.updateError(robot.drive.getHeadingError());
         robot.endLoop();
         if (headingLock) {
             robot.drive.setTeleOpDrive(
                     gamepad1Ex.getLeftY(),
                     -gamepad1Ex.getLeftX(),
-                    -gamepad1Ex.getRightX()
+                    controller.run()
             );
         } else {
             robot.drive.setTeleOpDrive(
@@ -65,6 +74,10 @@ public class DriveTeleOp extends OpMode {
      */
     public void bind(GamepadKeys.Button button, Command pressedCmd, Command releasedCmd) {
         gamepad1Ex.getGamepadButton(button).whenPressed(pressedCmd).whenReleased(releasedCmd);
+    }
+
+    public void bindToggle(GamepadKeys.Button button, Command toggleOnCommand) {
+        gamepad1Ex.getGamepadButton(button).toggleWhenPressed(toggleOnCommand);
     }
 
     public void bindToggle(GamepadKeys.Button button, Command toggleOnCommand, Command toggleOffCommand) {

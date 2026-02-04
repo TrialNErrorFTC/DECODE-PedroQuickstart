@@ -12,27 +12,16 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 
 public class MecanumDrive extends SubsystemBase {
+    public static final Pose blueGoalPose = new Pose(0, 144);
+    public static final Pose redGoalPose = blueGoalPose.mirror();
     private static final double TURRET_OFFSET = 2.0599;
     public static double PREDICT_FACTOR = 0.35;
-    RobotHardware robot = RobotHardware.get();
-    private Pose aimAtPose;
-
-    public static class AimAtTarget {
-        public double distance;
-        public double heading;
-
-        public AimAtTarget(double distance, double heading) {
-            this.distance = distance;
-            this.heading = heading;
-        }
-    }
-
+    public static Pose lastPose = new Pose(0, 0, 0);
     public AimAtTarget lastAimTarget = new AimAtTarget(0, 0);
 
     public Follower follower;
-    public static Pose lastPose = new Pose(0, 0, 0);
-    public static final Pose blueGoalPose = new Pose(0, 144);
-    public static final Pose redGoalPose = blueGoalPose.mirror();
+    RobotHardware robot = RobotHardware.get();
+    private Pose aimAtPose;
 
     public MecanumDrive(HardwareMap map, Pose startingPose) {
         this.follower = Constants.createFollower(map);
@@ -55,7 +44,7 @@ public class MecanumDrive extends SubsystemBase {
         robot.flightRecorder.addData("Y:", lastPose.getY());
         robot.flightRecorder.addData("Heading", Math.toDegrees(lastPose.getHeading()));
 
-        robot.flightRecorder.addData("Heading Error", getHeadingError());
+        robot.flightRecorder.addData("Heading Error", Math.toDegrees(getHeadingError()));
         follower.update();
     }
 
@@ -64,7 +53,7 @@ public class MecanumDrive extends SubsystemBase {
     }
 
     public void setTeleOpDrive(double forward, double strafe, double rotation) {
-        follower.setTeleOpDrive(forward, strafe, rotation, false);
+        follower.setTeleOpDrive(forward, strafe, rotation, true);
     }
 
     /**
@@ -140,15 +129,22 @@ public class MecanumDrive extends SubsystemBase {
         );
 
         double angleToTarget = Math.toDegrees(absAngleToTarget);
+        follower.getHeading();
         return new AimAtTarget(distance, angleToTarget);
     }
-    private double getHeadingError(){
-        if (follower.getCurrentPath() == null){
-            return 0;
-        }
 
-        double headingError = MathFunctions.getTurnDirection(follower.getPose().getHeading(),Math.toRadians(lastAimTarget.heading))
+    public double getHeadingError() {
+        return MathFunctions.getTurnDirection(follower.getPose().getHeading(), Math.toRadians(lastAimTarget.heading))
                 * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), Math.toRadians(lastAimTarget.heading));
-        return headingError;
+    }
+
+    public static class AimAtTarget {
+        public double distance;
+        public double heading;
+
+        public AimAtTarget(double distance, double heading) {
+            this.distance = distance;
+            this.heading = heading;
+        }
     }
 }
