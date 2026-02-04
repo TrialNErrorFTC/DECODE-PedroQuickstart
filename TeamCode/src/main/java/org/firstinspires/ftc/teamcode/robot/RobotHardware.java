@@ -9,6 +9,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
@@ -21,16 +22,21 @@ import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterAdjust;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
+import org.firstinspires.ftc.teamcode.utilities.BasicFilter;
+import org.firstinspires.ftc.teamcode.utilities.RunningAverageFilter;
 
 public class RobotHardware {
     private static final RobotHardware instance = new RobotHardware();
+    private static final double IDEAL_VOLTAGE = 12.5;
     public ShooterAdjust shooterAdjust;
+    private double lastMeasuredVoltage;
 
     public static enum Alliance {
         BLUE,
         RED
     }
-
+    public VoltageSensor batterySensor;
+    private final BasicFilter batteryFilter = new RunningAverageFilter(5);
     public static Alliance alliance;
     private Limelight3A limelight;
     public MotorEx shooterMotor;
@@ -41,7 +47,7 @@ public class RobotHardware {
     public CRServoEx servoTransferIntake;
     public JoinedTelemetry flightRecorder;
     public Intake intake;
-    private Shooter shooter;
+    public Shooter shooter;
     public Transfer transfer;
     public MecanumDrive drive;
 
@@ -80,6 +86,10 @@ public class RobotHardware {
         servoRight = new ServoEx(map, "servoRight");
         servoLeft.setInverted(true);
 
+        batterySensor = map.getAll(VoltageSensor.class)
+                .iterator()
+                .next();
+
         servoTransferShooter = new ServoEx(map, "servoTransfer");
         servoTransferIntake = new CRServoEx(map, "servoTransfer2");
         servoTransferIntake.setInverted(true);
@@ -94,6 +104,7 @@ public class RobotHardware {
         //create all subsystems
         intake = new Intake();
         shooter = new Shooter();
+        shooter.setMode(Shooter.Mode.FIXED);
         transfer = new Transfer();
         shooterAdjust = new ShooterAdjust();
         drive = new MecanumDrive(map, pose);
@@ -102,10 +113,12 @@ public class RobotHardware {
 
     /**
      * Returns Voltage Compensation Ratio to multiply with (prolly not needed)
-     *
      **/
     public double getVoltageFeedforwardConstant() {
-        return 0;
+        // 11.0 is just we don't place unnecessary strain if somehow the battery drops to something like 4v.
+        double safeVoltage = Math.max(lastMeasuredVoltage, 9.0);
+        batteryFilter.updateValue(IDEAL_VOLTAGE / safeVoltage);
+        return batteryFilter.getFilteredOutput();
     }
 
 
@@ -116,6 +129,8 @@ public class RobotHardware {
         //show alliance
         flightRecorder.addData("ALLIANCE", alliance.toString());
         // show battery
+        lastMeasuredVoltage = batterySensor.getVoltage();
+        flightRecorder.addData("BATTERY STATE", lastMeasuredVoltage);
         //run the scheduler
         CommandScheduler.getInstance().run();
         // update telemetry
