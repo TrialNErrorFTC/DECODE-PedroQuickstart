@@ -44,19 +44,18 @@ public class DriveTeleOp extends OpMode {
 
         CommandScheduler.getInstance().schedule(new SequentialCommandGroup(run(() -> robot.shooterAdjust.initializeServos()), run(() -> robot.transfer.off_position())));
 
-//        bind(GamepadKeys.Button.A, new TurnCommand(robot.drive.follower, Math.toRadians(robot.drive.lastAimTarget.heading), MathFunctions.getTurnDirection(robot.drive.lastPose.getHeading(), Math.toRadians(robot.drive.lastAimTarget.heading)) == 1), new InstantCommand());
+        bind(GamepadKeys.Button.A, new TurnCommand(robot.drive.follower, Math.toRadians(robot.drive.lastAimTarget.heading), MathFunctions.getTurnDirection(robot.drive.lastPose.getHeading(), Math.toRadians(robot.drive.lastAimTarget.heading)) == 1), new InstantCommand());
         bind(GamepadKeys.Button.B, new InstantCommand(() -> {
             headingLock = !headingLock;
         }), new InstantCommand());
-        bind(GamepadKeys.Button.DPAD_UP, new InstantCommand(() ->
-        {
+        bind(GamepadKeys.Button.DPAD_UP, new InstantCommand(() -> {
             robot.shooter.setVelocity(1500);
         }), new InstantCommand());
         bind(GamepadKeys.Button.DPAD_LEFT, new InstantCommand(() -> {
 
         }), new InstantCommand());
         bind(GamepadKeys.Button.DPAD_RIGHT, new InstantCommand(() -> {
-            robot.shooter.setVelocity(robot.shooter.targetVelocityTicks - 50);
+
         }), new InstantCommand());
     }
 

@@ -5,10 +5,10 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
+import org.firstinspires.ftc.teamcode.utilities.PIDFController;
 import org.firstinspires.ftc.teamcode.utilities.RunningAverageFilter;
 
 @Configurable
@@ -29,8 +29,8 @@ public class Shooter extends SubsystemBase {
     public static double targetRawPower = 0.0;
 
     public static double IDLE_VELOCITY = 0;
-    public static double kV = 0.0;
-    public static double kP = 0.0;
+    public static double kV = 0.47;
+    public static double kP = 0.06;
     public static double kI = 0.0;
     public static double kD = 0.0;
     public static double VELOCITY_TOLERANCE = 40.0;
@@ -38,7 +38,7 @@ public class Shooter extends SubsystemBase {
     public static double FAR_ZONE_OFFSET = 0.0;
 
 
-    private final com.seattlesolvers.solverslib.controller.PIDFController flywheelVelocityPID = new PIDFController(kP, kI, kD, 0);
+    private PIDFController flywheelVelocityPID = new PIDFController(kP, kI, kD, 0);
 
     private double getKD() {
         return kD;
@@ -105,7 +105,7 @@ public class Shooter extends SubsystemBase {
         p.addData("Current Velocity", velFilter.getFilteredOutput());
         p.update();
 
-        velFilter.updateValue(robot.shooterMotor.getCorrectedVelocity());
+        velFilter.updateValue(robot.shooterMotor.getVelocity());
 
         logData();
     }
@@ -137,13 +137,9 @@ public class Shooter extends SubsystemBase {
     }
 
     private void velocityMode() {
-
-        double currentVelocity = velFilter.getFilteredOutput();
-        // voltage comp is necessary to prevent the bot from tweaking towards the end of the match
-        double output = flywheelVelocityPID.calculate(currentVelocity, targetVelocityTicks) +
-                getKV() * targetVelocityTicks + getKS();
-
-        robot.shooterMotor.set(output);
+        robot.shooterMotor.setPower(
+                flywheelVelocityPID.calculate(targetVelocityTicks - robot.shooterMotor.getVelocity())
+        );
     }
 
     private double getKS() {
@@ -167,14 +163,14 @@ public class Shooter extends SubsystemBase {
 //    }
 
     private void rawMode() {
-        robot.shooterMotor.set(targetRawPower);
+        robot.shooterMotor.setPower(targetRawPower);
     }
 
     private void logData() {
         robot.flightRecorder.addLine("========SHOOTER========");
         robot.flightRecorder.addData("Flywheel Target velocity", targetVelocityTicks);
-        robot.flightRecorder.addData("Flywheel Current velocity", robot.shooterMotor.encoder.getCorrectedVelocity());
-        robot.flightRecorder.addData("Flywheel raw power output", robot.shooterMotor.get());
+        robot.flightRecorder.addData("Flywheel Current velocity", robot.shooterMotor.getVelocity());
+        robot.flightRecorder.addData("Flywheel raw power output", robot.shooterMotor.getPower());
     }
 
 //    public boolean isAtTargetVelocity() {

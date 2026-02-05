@@ -7,6 +7,9 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -41,7 +44,7 @@ public class RobotHardware {
     private final BasicFilter batteryFilter = new RunningAverageFilter(5);
     public static Alliance alliance;
     private Limelight3A limelight;
-    public MotorEx shooterMotor;
+    public DcMotorEx shooterMotor;
     public MotorEx intakeMotor;
     public ServoEx servoLeft;
     public ServoEx servoRight;
@@ -80,9 +83,9 @@ public class RobotHardware {
         //instantiate all hardware
 
         //shooter motor
-        shooterMotor = new MotorEx(map, "motorS");
+        shooterMotor = map.get(DcMotorEx.class, "motorS");
         intakeMotor = new MotorEx(map, "motorI");
-        shooterMotor.setInverted(true);
+        shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         servoLeft = new ServoEx(map, "servoLeft");
         servoRight = new ServoEx(map, "servoRight");
@@ -107,7 +110,7 @@ public class RobotHardware {
         intake = new Intake();
         shooter = new Shooter();
         shooter.setMode(Shooter.Mode.FIXED);
-        shooterMotor.setRunMode(Motor.RunMode.RawPower);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         transfer = new Transfer();
         shooterAdjust = new ShooterAdjust();
         drive = new MecanumDrive(map, pose);
