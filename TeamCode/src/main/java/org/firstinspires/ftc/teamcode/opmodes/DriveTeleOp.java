@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import static org.firstinspires.ftc.teamcode.cmd.Commandlet.fork;
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.run;
+import static org.firstinspires.ftc.teamcode.cmd.Commandlet.waitFor;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.PIDFController;
@@ -37,45 +39,66 @@ public class DriveTeleOp extends OpMode {
         robot.init(hardwareMap, telemetry, new Pose(72, 72, Math.toRadians(90)));
         RobotHardware.alliance = RobotHardware.Alliance.RED;
 
-        robot.drive.follower.startTeleOpDrive();
+        robot.drive.follower.startTeleOpDrive(true);
         gamepad1Ex = new GamepadEx(gamepad1);
 
-        controller = new PIDFController(robot.drive.follower.constants.coefficientsHeadingPIDF);
+//        controller = new PIDFController(robot.drive.follower.constants.coefficientsHeadingPIDF);
+//
+//        InstantCommand m_initialize = new InstantCommand(robot.shooterAdjust::initializeServos);
+//        InstantCommand m_offCommand = new InstantCommand(robot.transfer::off_position);
 
-        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(run(() -> robot.shooterAdjust.initializeServos()), run(() -> robot.transfer.off_position())));
+//        SequentialCommandGroup m_threeBallShoot2 = new SequentialCommandGroup(
+//                fork(
+//                        new InstantCommand(robot.transfer::shoot_position),
+//                        new InstantCommand(() -> {
+//                            robot..motor_intake.setPower(0.375);
+//                        })
+//                ),
+//                waitFor(400),
+//                fork(
+//                        new InstantCommand(m_transfer::transfer),
+//                        new InstantCommand(m_intake::forward)
+//                ),
+//                waitFor(3000),
+//                fork(
+//                        new InstantCommand(m_transfer::stop),
+//                        new InstantCommand(m_intake::stop)
+//                ),
+//                new InstantCommand(m_transfer::off_position)
+//
+//        );
+//        CommandScheduler.getInstance().schedule(new SequentialCommandGroup(run(() -> robot.shooterAdjust.initializeServos()), run(() -> robot.transfer.off_position())));
 
-        bind(GamepadKeys.Button.A, new TurnCommand(robot.drive.follower, Math.toRadians(robot.drive.lastAimTarget.heading), MathFunctions.getTurnDirection(robot.drive.lastPose.getHeading(), Math.toRadians(robot.drive.lastAimTarget.heading)) == 1), new InstantCommand());
-        bind(GamepadKeys.Button.B, new InstantCommand(() -> {
-            headingLock = !headingLock;
-        }), new InstantCommand());
-        bind(GamepadKeys.Button.DPAD_UP, new InstantCommand(() -> {
-            robot.shooter.setVelocity(1500);
-        }), new InstantCommand());
-        bind(GamepadKeys.Button.DPAD_LEFT, new InstantCommand(() -> {
-
-        }), new InstantCommand());
-        bind(GamepadKeys.Button.DPAD_RIGHT, new InstantCommand(() -> {
-
-        }), new InstantCommand());
+//        bind(GamepadKeys.Button.A,
+//                new TurnCommand(robot.drive.follower, Math.toRadians(robot.drive.lastAimTarget.heading),
+//                        MathFunctions.getTurnDirection(robot.drive.lastPose.getHeading(),
+//                                Math.toRadians(robot.drive.lastAimTarget.heading)) == 1),
+//                new InstantCommand());
+//        bind(GamepadKeys.Button.B, new InstantCommand(() -> {
+//            headingLock = !headingLock;
+//        }), new InstantCommand());
+//        bind(GamepadKeys.Button.DPAD_UP, new InstantCommand(() -> {
+//            robot.shooter.setVelocity(1500);
+//        }), new InstantCommand());
+//        bind(GamepadKeys.Button.DPAD_LEFT, new InstantCommand(() -> {
+//
+//        }), new InstantCommand());
+//        bind(GamepadKeys.Button.DPAD_RIGHT, new InstantCommand(() -> {
+//
+//        }), new InstantCommand());
     }
 
     @Override
     public void loop() {
-        controller.setCoefficients(robot.drive.follower.constants.coefficientsHeadingPIDF);
-        controller.updateError(robot.drive.getHeadingError());
-        robot.shooter.setVelocity(getTargetVelocity());
+//        controller.setCoefficients(robot.drive.follower.constants.coefficientsHeadingPIDF);
+//        controller.updateError(robot.drive.getHeadingError());
+//        robot.shooter.setVelocity(getTargetVelocity());
         robot.endLoop();
-
-        if (headingLock) {
-            robot.drive.setTeleOpDrive(gamepad1Ex.getLeftY(), -gamepad1Ex.getLeftX(), controller.run());
-        } else {
-            robot.drive.setTeleOpDrive(gamepad1Ex.getLeftY(), -gamepad1Ex.getLeftX(), -gamepad1Ex.getRightX());
-        }
     }
 
-    private double getTargetVelocity() {
-        return TARGET_VELOCITY;
-    }
+//    private double getTargetVelocity() {
+//        return TARGET_VELOCITY;
+//    }
 
     /**
      * Binds a gamepad button to a command.
