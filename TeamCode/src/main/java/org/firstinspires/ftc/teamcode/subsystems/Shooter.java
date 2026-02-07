@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
-import com.seattlesolvers.solverslib.util.InterpLUT;
 
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
-import org.firstinspires.ftc.teamcode.utilities.PIDFController;
+import org.firstinspires.ftc.teamcode.utilities.PIDFControllerNew;
 import org.firstinspires.ftc.teamcode.utilities.RunningAverageFilter;
 
 @Configurable
@@ -25,20 +25,21 @@ public class Shooter extends SubsystemBase {
     public static Mode mode = Mode.RAW;
     private final RunningAverageFilter velFilter = new RunningAverageFilter(5);
 
-    public static double targetVelocityTicks = 0.0;
+    public static double targetVelocityRPM = 0.0;
     public static double targetRawPower = 0.0;
 
     public static double IDLE_VELOCITY = 0;
-    public static double kV = 0.47;
-    public static double kP = 0.06;
+    public static double kV = 0.00047;
+    public static double kP = 0.021;
     public static double kI = 0.0;
     public static double kD = 0.0;
     public static double VELOCITY_TOLERANCE = 40.0;
     public static double CLOSE_ZONE_OFFSET = 0.0;
     public static double FAR_ZONE_OFFSET = 0.0;
+    public ElapsedTime timer;
 
 
-    private PIDFController flywheelVelocityPID = new PIDFController(kP, kI, kD, 0);
+    private PIDFControllerNew flywheelVelocityPID;
 
     private double getKD() {
         return kD;
@@ -82,6 +83,8 @@ public class Shooter extends SubsystemBase {
 //    }
 
     public Shooter() {
+        timer = robot.timer;
+        flywheelVelocityPID = new PIDFControllerNew(kP, kI, kD, kV, timer);
     }
 
     @Override
@@ -100,14 +103,7 @@ public class Shooter extends SubsystemBase {
                 break;
         }
 
-        TelemetryManager p = PanelsTelemetry.INSTANCE.getTelemetry();
-        p.addData("Target Velocity", targetVelocityTicks);
-        p.addData("Current Velocity", velFilter.getFilteredOutput());
-        p.update();
 
-        velFilter.updateValue(robot.shooterMotor.getVelocity());
-
-        logData();
     }
 
     public void setMode(Mode mode) {
@@ -124,7 +120,11 @@ public class Shooter extends SubsystemBase {
 
     public void setVelocity(double velo) {
         mode = Mode.FIXED;
-        targetVelocityTicks = velo;
+        targetVelocityRPM = velo;
+    }
+
+    public double getVelocity() {
+        return targetVelocityRPM;
     }
 
     public void setPower(double pow) {
@@ -136,9 +136,15 @@ public class Shooter extends SubsystemBase {
         setVelocity(IDLE_VELOCITY);
     }
 
+    public double RPMtoVelo(double value) {
+        return value * 28 / 60;
+    }
+
+    ;
+
     private void velocityMode() {
         robot.shooterMotor.setPower(
-                flywheelVelocityPID.calculate(targetVelocityTicks - robot.shooterMotor.getVelocity())
+                flywheelVelocityPID.calculate(RPMtoVelo(targetVelocityRPM), robot.shooterMotor.getVelocity())
         );
     }
 
@@ -150,7 +156,10 @@ public class Shooter extends SubsystemBase {
         return kV;
     }
 
-
+    private double goalDistanceToRPM(double distance) {
+        double targetRPM = -12.8 * distance + 0.82;
+        return targetRPM;
+    }
 //    private void dynamicMode() {
 //        double currentVelocity = velFilter.getFilteredOutput();
 //        // clip to a distance
@@ -167,10 +176,6 @@ public class Shooter extends SubsystemBase {
     }
 
     private void logData() {
-        robot.flightRecorder.addLine("========SHOOTER========");
-        robot.flightRecorder.addData("Flywheel Target velocity", targetVelocityTicks);
-        robot.flightRecorder.addData("Flywheel Current velocity", robot.shooterMotor.getVelocity());
-        robot.flightRecorder.addData("Flywheel raw power output", robot.shooterMotor.getPower());
     }
 
 //    public boolean isAtTargetVelocity() {

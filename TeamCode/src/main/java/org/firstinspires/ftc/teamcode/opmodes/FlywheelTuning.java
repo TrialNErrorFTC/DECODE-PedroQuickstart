@@ -3,21 +3,23 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.JoinedTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.utilities.PIDFController;
+import org.firstinspires.ftc.teamcode.utilities.PIDFControllerNew;
 
 @Configurable
 @TeleOp
 public class FlywheelTuning extends OpMode {
-    private PIDFController controller;
+    private PIDFControllerNew controller;
     private DcMotorEx motor;
     public static double targetVelocity, velocity;
+
+    public ElapsedTime timer;
     public static double P, I, kV, kS;
     JoinedTelemetry joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
 
@@ -25,9 +27,10 @@ public class FlywheelTuning extends OpMode {
     public void init() {
         //TODO: Set motor name and direction
         motor = hardwareMap.get(DcMotorEx.class, "motorS");
+        timer = new ElapsedTime();
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        controller = new PIDFController(getP(), getI(), 0.0, 0.0);
+        controller = new PIDFControllerNew(getP(), getI(), 0.0, 0.0, timer);
     }
 
     private double getI() {
@@ -43,9 +46,10 @@ public class FlywheelTuning extends OpMode {
         joinedTelemetry.addData("TargetVel", getTargetVelocity());
         joinedTelemetry.addData("CurrentVel", velocity * 60 / 28);
         joinedTelemetry.addData("Vel Error", getTargetVelocity() - velocity * 60 / 28);
+        joinedTelemetry.addData("Time", 1.0 / timer.seconds());
         controller.setPIDF(getP(), getI(), 0.0, getKV());
         velocity = motor.getVelocity();
-        motor.setPower(controller.calculate(getTargetVelocity() * ((double) 28 / 60) - velocity));
+        motor.setPower(controller.calculate(getTargetVelocity() * 28 / 60, velocity));
         joinedTelemetry.update();
 
 

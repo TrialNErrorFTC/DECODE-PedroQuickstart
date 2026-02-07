@@ -42,7 +42,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * If you are using OnBotJava, please see the ConceptSoundsOnBotJava sample
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
+ * Remove or comment out the @Disabled line to add this OpMode to theDriver Station OpMode list
  *
  * Operation:
  *
@@ -67,7 +67,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  *
  */
 
-@TeleOp(name="Concept: Sound Resources", group="Concept")
+@TeleOp(name = "Concept: Sound Resources", group = "Concept")
 @Disabled
 public class ConceptSoundsASJava extends LinearOpMode {
 
@@ -86,19 +86,19 @@ public class ConceptSoundsASJava extends LinearOpMode {
 
         // Determine Resource IDs for sounds built into the RC application.
         int silverSoundID = hardwareMap.appContext.getResources().getIdentifier("silver", "raw", hardwareMap.appContext.getPackageName());
-        int goldSoundID   = hardwareMap.appContext.getResources().getIdentifier("gold",   "raw", hardwareMap.appContext.getPackageName());
+        int goldSoundID = hardwareMap.appContext.getResources().getIdentifier("gold", "raw", hardwareMap.appContext.getPackageName());
 
         // Determine if sound resources are found.
         // Note: Preloading is NOT required, but it's a good way to verify all your sounds are available before you run.
         if (goldSoundID != 0)
-            goldFound   = SoundPlayer.getInstance().preload(hardwareMap.appContext, goldSoundID);
+            goldFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, goldSoundID);
 
         if (silverSoundID != 0)
             silverFound = SoundPlayer.getInstance().preload(hardwareMap.appContext, silverSoundID);
 
         // Display sound status
-        telemetry.addData("gold resource",   goldFound ?   "Found" : "NOT found\n Add gold.wav to /src/main/res/raw" );
-        telemetry.addData("silver resource", silverFound ? "Found" : "Not found\n Add silver.wav to /src/main/res/raw" );
+        telemetry.addData("gold resource", goldFound ? "Found" : "NOT found\n Add gold.wav to /src/main/res/raw");
+        telemetry.addData("silver resource", silverFound ? "Found" : "Not found\n Add silver.wav to /src/main/res/raw");
 
         // Wait for the game to start (driver presses START)
         telemetry.addData(">", "Press Start to continue");

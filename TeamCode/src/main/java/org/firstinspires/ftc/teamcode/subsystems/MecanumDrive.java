@@ -1,15 +1,25 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import android.view.animation.GridLayoutAnimationController;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.MathFunctions;
 import com.pedropathing.math.Vector;
+import com.pedropathing.paths.PathChain;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.pedroCommand.TurnCommand;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MecanumDrive extends SubsystemBase {
     public static final Pose blueGoalPose = new Pose(0, 144);
@@ -17,14 +27,36 @@ public class MecanumDrive extends SubsystemBase {
     private static final double TURRET_OFFSET = 2.0599;
     public static double PREDICT_FACTOR = 0.35;
     public static Pose lastPose = new Pose(0, 0, 0);
+    private final DcMotor frontLeft;
+    private final DcMotor frontRight;
+    private final DcMotor backLeft;
+    private final DcMotor backRight;
     public AimAtTarget lastAimTarget = new AimAtTarget(0, 0);
 
     public Follower follower;
     RobotHardware robot = RobotHardware.get();
-    private Pose aimAtPose;
+    public Pose aimAtPose;
+    private double turnDirection;
 
     public MecanumDrive(HardwareMap map, Pose startingPose) {
         this.follower = Constants.createFollower(map);
+
+        //this is for teleop
+
+        frontLeft = map.get(DcMotor.class, "motorFL");
+        frontRight = map.get(DcMotor.class, "motorFR");
+        backLeft = map.get(DcMotor.class, "motorBL");
+        backRight = map.get(DcMotor.class, "motorBR");
+
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //Reverse the left side motors
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+
         follower.setStartingPose(startingPose == null ? new Pose(0, 0, 0) : startingPose);
         follower.update();
     }
@@ -34,18 +66,7 @@ public class MecanumDrive extends SubsystemBase {
         lastPose = follower.getPose();
 
         lastAimTarget = getShooterPositionPinpointRel2();
-        robot.flightRecorder.addLine("======DRIVETRAIN:=======");
-        robot.flightRecorder.addData("goal heading", lastAimTarget.heading);
-        robot.flightRecorder.addData("goal distance", lastAimTarget.distance);
-        robot.flightRecorder.addData("goal x", aimAtPose.getX());
-        robot.flightRecorder.addData("goal y", aimAtPose.getY());
 
-        robot.flightRecorder.addData("X:", lastPose.getX());
-        robot.flightRecorder.addData("Y:", lastPose.getY());
-        robot.flightRecorder.addData("Heading", Math.toDegrees(lastPose.getHeading()));
-
-        robot.flightRecorder.addData("Heading Error", Math.toDegrees(getHeadingError()));
-        follower.update();
     }
 
     public void resetHeading(double newHeading) {
@@ -53,7 +74,10 @@ public class MecanumDrive extends SubsystemBase {
     }
 
     public void setTeleOpDrive(double forward, double strafe, double rotation) {
-        follower.setTeleOpDrive(forward, strafe, rotation, true);
+        frontLeft.setPower(forward + strafe + rotation);
+        frontRight.setPower(forward - strafe - rotation);
+        backLeft.setPower(forward - strafe + rotation);
+        backRight.setPower(forward + strafe - rotation);
     }
 
     /**
@@ -134,9 +158,10 @@ public class MecanumDrive extends SubsystemBase {
     }
 
     public double getHeadingError() {
-        return MathFunctions.getTurnDirection(follower.getPose().getHeading(), Math.toRadians(getAimTarget().heading))
-                * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), Math.toRadians(getAimTarget().heading));
+        turnDirection = MathFunctions.getTurnDirection(follower.getPose().getHeading(), Math.toRadians(getAimTarget().heading));
+        return turnDirection * MathFunctions.getSmallestAngleDifference(follower.getPose().getHeading(), Math.toRadians(getAimTarget().heading));
     }
+
 
     public static class AimAtTarget {
         public double distance;

@@ -7,6 +7,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -22,28 +23,39 @@ import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightPoseEstimator;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumTeleDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterAdjust;
 import org.firstinspires.ftc.teamcode.subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.utilities.BasicFilter;
 import org.firstinspires.ftc.teamcode.utilities.RunningAverageFilter;
 
+import java.util.List;
+
 public class RobotHardware {
     private static final RobotHardware instance = new RobotHardware();
     private static final double IDEAL_VOLTAGE = 12.5;
     public ShooterAdjust shooterAdjust;
+    public ElapsedTime timer;
     private double lastMeasuredVoltage;
+    public LimelightPoseEstimator limelightPoseEstimator;
 
     public static enum Alliance {
         BLUE,
         RED
     }
 
+    public static enum Mode {
+        TELEOP,
+        AUTO
+    }
+
     public VoltageSensor batterySensor;
     private final BasicFilter batteryFilter = new RunningAverageFilter(5);
     public static Alliance alliance;
-    private Limelight3A limelight;
+    public Limelight3A limelight;
     public DcMotorEx shooterMotor;
     public MotorEx intakeMotor;
     public ServoEx servoLeft;
@@ -55,6 +67,9 @@ public class RobotHardware {
     public Shooter shooter;
     public Transfer transfer;
     public MecanumDrive drive;
+
+    public MecanumTeleDrive teleDrive;
+    public Mode mode;
 
     public RobotHardware() {
     }
@@ -79,14 +94,15 @@ public class RobotHardware {
      * @param telemetry telemetry to use
      * @return RobotHardware
      **/
-    public RobotHardware init(HardwareMap map, Telemetry telemetry, Pose pose) {
+    public RobotHardware init(HardwareMap map, Mode mode, Telemetry telemetry, Pose pose) {
         //instantiate all hardware
+        this.mode = mode;
 
         //shooter motor
         shooterMotor = map.get(DcMotorEx.class, "motorS");
         intakeMotor = new MotorEx(map, "motorI");
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         servoLeft = new ServoEx(map, "servoLeft");
         servoRight = new ServoEx(map, "servoRight");
         servoLeft.setInverted(true);
@@ -98,22 +114,33 @@ public class RobotHardware {
         servoTransferShooter = new ServoEx(map, "servoTransfer");
         servoTransferIntake = new CRServoEx(map, "servoTransfer2");
         servoTransferIntake.setInverted(true);
-
+        List<LynxModule> allHubs = map.getAll(LynxModule.class);
 
         limelight = map.get(Limelight3A.class, "limelight");
 
+        timer = new ElapsedTime();
 
         flightRecorder = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
         //TODO: Set Up Telemetry
 
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+
         //create all subsystems
         intake = new Intake();
         shooter = new Shooter();
-        shooter.setMode(Shooter.Mode.FIXED);
-        shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         transfer = new Transfer();
         shooterAdjust = new ShooterAdjust();
-        drive = new MecanumDrive(map, pose);
+        limelightPoseEstimator = new LimelightPoseEstimator();
+
+        if (mode == Mode.AUTO) {
+            drive = new MecanumDrive(map, pose);
+        } else if (mode == Mode.TELEOP) {
+            teleDrive = new MecanumTeleDrive(map);
+//            drive = new MecanumDrive(map, pose);
+        }
+        flightRecorder.addLine("======DRIVETRAIN:=======");
         return this;
     }
 
@@ -135,11 +162,35 @@ public class RobotHardware {
     public void endLoop() {
         //show alliance
         flightRecorder.addData("ALLIANCE", alliance.toString());
+
+        flightRecorder.addLine("======LIMELIGHT:=======");
+        flightRecorder.addData("TX:", limelightPoseEstimator.getTx());
+        flightRecorder.addData("TY:", limelightPoseEstimator.getTy());
+        flightRecorder.addData("Distance From Goal:", limelightPoseEstimator.distanceToGoal());
+//        if (mode == Mode.AUTO) {
+//            flightRecorder.addLine("======DRIVETRAIN:=======");
+//            flightRecorder.addData("goal heading", drive.lastAimTarget.heading);
+//            flightRecorder.addData("goal distance", drive.lastAimTarget.distance);
+//            flightRecorder.addData("goal x", drive.aimAtPose.getX());
+//            flightRecorder.addData("goal y", drive.aimAtPose.getY());
+//
+//            flightRecorder.addData("X:", drive.lastPose.getX());
+//            flightRecorder.addData("Y:", drive.lastPose.getY());
+//            flightRecorder.addData("Heading", Math.toDegrees(drive.lastPose.getHeading()));
+//
+//            flightRecorder.addData("Heading Error", Math.toDegrees(drive.getHeadingError()));
+//        }
+
+        flightRecorder.addLine("========SHOOTER========");
+        flightRecorder.addData("Flywheel Target velocity", shooter.getVelocity());
+        flightRecorder.addData("Flywheel Current velocity", shooterMotor.getVelocity() * 60 / 28);
+        flightRecorder.addData("Flywheel raw power output", shooterMotor.getPower());
         // show battery
         lastMeasuredVoltage = batterySensor.getVoltage();
         flightRecorder.addData("BATTERY STATE", lastMeasuredVoltage);
         //run the scheduler
         CommandScheduler.getInstance().run();
+
         // update telemetry
         flightRecorder.update();
     }
