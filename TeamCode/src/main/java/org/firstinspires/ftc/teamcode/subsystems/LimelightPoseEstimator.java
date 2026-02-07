@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
@@ -23,7 +23,7 @@ public class LimelightPoseEstimator extends SubsystemBase {
     }
 
     // how many degrees back is your limelight rotated from perfectly vertical?
-    public double limelightMountAngleDegrees = 36.8;
+    public double limelightMountAngleDegrees = 24.7411;
 
     // distance from the center of the Limelight lens to the floor
     public double limelightLensHeightInches = 10.0;
@@ -44,46 +44,25 @@ public class LimelightPoseEstimator extends SubsystemBase {
         }
     }
 
-    public void periodic() {
-        result = robot.limelight.getLatestResult();
+    public boolean isValidTarget() {
+        return robot.limelight.getLatestResult().isValid() && robot.limelight.getLatestResult() != null;
     }
 
     public double getTx() {
-        LLResult result = robot.limelight.getLatestResult();
+        return robot.limelight.getLatestResult().getTx();
 
-        //check for result is null
-        if (result != null && result.isValid()) {
-            return result.getTx();
-        }
-        return -99999;
     }
 
-
-    public double drivePower() {
-        double heading_error = -getTx();
-        double steering_adjust = 0;
-        if (Math.abs(heading_error) > 1.0) {
-            if (heading_error < 0) {
-                steering_adjust = Kp() * heading_error + min_command;
-            } else {
-                steering_adjust = Kp() * heading_error - min_command;
-            }
-        }
-        return steering_adjust;
-    }
 
     public double Kp() {
         return Kp;
     }
 
     public double getTy() {
-        LLResult result = robot.limelight.getLatestResult();
+//        LLResult result = robot.limelight.getLatestResult();
 
         //check for result is null
-        if (result != null && result.isValid()) {
-            return result.getTy();
-        }
-        return -99999;
+        return robot.limelight.getLatestResult().getTy();
     }
 
     /**
@@ -92,7 +71,6 @@ public class LimelightPoseEstimator extends SubsystemBase {
      * @return
      */
     public double distanceToGoal() {
-
         double angleToGoalDegrees = limelightMountAngleDegrees + this.getTy();
         double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
 

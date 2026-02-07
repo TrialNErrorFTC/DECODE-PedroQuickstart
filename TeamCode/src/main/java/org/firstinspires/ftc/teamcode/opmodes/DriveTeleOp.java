@@ -118,9 +118,11 @@ public class DriveTeleOp extends OpMode {
         bindToggle(GamepadKeys.Button.X, m_threeBallShoot2);
         bindToggle(GamepadKeys.Button.Y, new InstantCommand(
                 () -> {
-                    robot.shooterAdjust.setServos(
-                            robot.shooterAdjust.goalDistanceToAngle(robot.limelightPoseEstimator.distanceToGoal())
-                    );
+                    if (robot.limelightPoseEstimator.isValidTarget()) {
+                        robot.shooterAdjust.setServos(
+                                robot.shooterAdjust.goalDistanceToAngle(robot.limelightPoseEstimator.distanceToGoal())
+                        );
+                    }
                 }
         ));
 
@@ -153,7 +155,6 @@ public class DriveTeleOp extends OpMode {
         } else {
             robot.teleDrive.setTeleOpDrive(0, 0, Kp * robot.limelight.getLatestResult().getTx());
         }
-
     }
 //    private double getTargetVelocity() {
 //        return TARGET_VELOCITY;

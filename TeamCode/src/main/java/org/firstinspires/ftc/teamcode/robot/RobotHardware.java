@@ -163,10 +163,12 @@ public class RobotHardware {
         //show alliance
         flightRecorder.addData("ALLIANCE", alliance.toString());
 
-        flightRecorder.addLine("======LIMELIGHT:=======");
-        flightRecorder.addData("TX:", limelightPoseEstimator.getTx());
-        flightRecorder.addData("TY:", limelightPoseEstimator.getTy());
-        flightRecorder.addData("Distance From Goal:", limelightPoseEstimator.distanceToGoal());
+        if (limelightPoseEstimator.isValidTarget()) {
+            flightRecorder.addLine("======LIMELIGHT:=======");
+            flightRecorder.addData("TX:", limelightPoseEstimator.getTx());
+            flightRecorder.addData("TY:", limelightPoseEstimator.getTy());
+            flightRecorder.addData("Distance From Goal:", limelightPoseEstimator.distanceToGoal());
+        }
 //        if (mode == Mode.AUTO) {
 //            flightRecorder.addLine("======DRIVETRAIN:=======");
 //            flightRecorder.addData("goal heading", drive.lastAimTarget.heading);
