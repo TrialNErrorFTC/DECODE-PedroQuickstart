@@ -95,6 +95,7 @@ public class RobotHardware {
      * @return RobotHardware
      **/
     public RobotHardware init(HardwareMap map, Mode mode, Telemetry telemetry, Pose pose) {
+        CommandScheduler.getInstance().reset();
         //instantiate all hardware
         this.mode = mode;
 

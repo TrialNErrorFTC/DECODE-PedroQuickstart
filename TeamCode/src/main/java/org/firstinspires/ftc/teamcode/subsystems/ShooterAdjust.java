@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 
+@Configurable
 public class ShooterAdjust extends SubsystemBase {
     private final RobotHardware robot;
+    public static double slope = -0.117;
 
     public ShooterAdjust() {
         robot = RobotHardware.get();
@@ -21,11 +24,16 @@ public class ShooterAdjust extends SubsystemBase {
         robot.servoRight.set(angle);
     }
 
+
     public double goalDistanceToAngle(double distance) {
         if (12 < distance && distance < 60) {
-            double hoodPosition = Range.clip(-0.0117 * distance + 0.82, 0, 1);
+            double hoodPosition = Range.clip(getSlope() * distance + 0.82, 0, 1);
             return hoodPosition;
         }
         return 0;
+    }
+
+    public double getSlope() {
+        return slope;
     }
 }

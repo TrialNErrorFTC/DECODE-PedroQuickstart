@@ -23,7 +23,7 @@ public class LimelightPoseEstimator extends SubsystemBase {
     }
 
     // how many degrees back is your limelight rotated from perfectly vertical?
-    public double limelightMountAngleDegrees = 24.7411;
+    public double limelightMountAngleDegrees = 36.3477;
 
     // distance from the center of the Limelight lens to the floor
     public double limelightLensHeightInches = 10.0;
@@ -38,9 +38,9 @@ public class LimelightPoseEstimator extends SubsystemBase {
         robot.limelight.setPollRateHz(100);
         robot.limelight.start();
         if (robot.alliance == RobotHardware.Alliance.BLUE) {
-            robot.limelight.pipelineSwitch(1);
-        } else {
             robot.limelight.pipelineSwitch(0);
+        } else {
+            robot.limelight.pipelineSwitch(1);
         }
     }
 

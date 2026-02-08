@@ -148,6 +148,14 @@ public class Shooter extends SubsystemBase {
         );
     }
 
+    public double goalDistanceToRPM(double distance) {
+        if (12 < distance && distance < 60) {
+            double hoodPosition = Range.clip(11 * distance + 1664, 1700, 2500);
+            return hoodPosition;
+        }
+        return 0;
+    }
+
     private double getKS() {
         return kS;
     }
@@ -156,10 +164,6 @@ public class Shooter extends SubsystemBase {
         return kV;
     }
 
-    private double goalDistanceToRPM(double distance) {
-        double targetRPM = -12.8 * distance + 0.82;
-        return targetRPM;
-    }
 //    private void dynamicMode() {
 //        double currentVelocity = velFilter.getFilteredOutput();
 //        // clip to a distance

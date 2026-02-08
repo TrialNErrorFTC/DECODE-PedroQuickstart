@@ -7,32 +7,25 @@ import static org.firstinspires.ftc.teamcode.cmd.Commandlet.waitFor;
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.control.PIDFController;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.MathFunctions;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.ScheduleCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
-import com.seattlesolvers.solverslib.command.button.Button;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-import com.seattlesolvers.solverslib.pedroCommand.TurnCommand;
 
-import org.firstinspires.ftc.teamcode.command.SetVelocityAndWait;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.MecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
-import org.firstinspires.ftc.teamcode.utilities.DefaultDrive;
 
 
 @Configurable
 @TeleOp(name = "DriveTrain TeleOp")
-public class DriveTeleOp extends OpMode {
+public class DriveTeleOpRed extends OpMode {
     public static double TARGET_VELOCITY = 0.0;
     public static double Kp = 0.02;
     private GamepadEx gamepad1Ex;
@@ -48,7 +41,7 @@ public class DriveTeleOp extends OpMode {
         CommandScheduler.getInstance().reset();
         robot = RobotHardware.get();
         robot.init(hardwareMap, RobotHardware.Mode.TELEOP, telemetry, new Pose(72, 72, Math.toRadians(90)));
-        RobotHardware.alliance = RobotHardware.Alliance.BLUE;
+        RobotHardware.alliance = RobotHardware.Alliance.RED;
 
         gamepad1Ex = new GamepadEx(gamepad1);
 
