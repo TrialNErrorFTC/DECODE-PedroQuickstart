@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.fork;
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.waitFor;
+import static org.firstinspires.ftc.teamcode.opmodes.DriveTeleOpBlue.Kp;
 
 import androidx.annotation.NonNull;
 
@@ -13,21 +14,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.LogCatCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
-import com.seattlesolvers.solverslib.command.ParallelRaceGroup;
-import com.seattlesolvers.solverslib.command.RepeatCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
-import com.seattlesolvers.solverslib.command.button.Button;
-import com.seattlesolvers.solverslib.command.button.GamepadButton;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
-import com.seattlesolvers.solverslib.pedroCommand.TurnToCommand;
 import com.seattlesolvers.solverslib.util.TelemetryData;
-
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
@@ -39,11 +30,11 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
  * It's responsible for initializing subsystems and mapping gamepad inputs to robot actions.
  */
 @Autonomous
-public class sixBallShoot extends CommandOpMode {
+public class moveForward extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);//Poses
     public static Pose startPose = new Pose(21.122235157159484, 123.54831199068684, Math.toRadians(140));
-    public static Pose shootPose = new Pose(40.59022118742725, 102.10942956926658, Math.toRadians(140));
+    public static Pose shootPose = new Pose(50.77894736842105, 108.60231660231659, Math.toRadians(140));
     public static Pose pickup1StartPose = new Pose(44.67520372526194, 90.23748544819556, Math.toRadians(180));
     public static Pose pickup1EndPose = new Pose(20.973806752037255, 90.23748544819556, Math.toRadians(180));
 
@@ -111,8 +102,16 @@ public class sixBallShoot extends CommandOpMode {
 
     }
 
+    public void autoAimAdjust() {
+        if (robot.limelight.getLatestResult() != null && robot.limelight.getLatestResult().isValid()) {
+            double drivePowers[] = {Kp * robot.limelight.getLatestResult().getTx(), Kp * robot.limelight.getLatestResult().getTx(), -Kp * robot.limelight.getLatestResult().getTx(), -Kp * robot.limelight.getLatestResult().getTx()};
+            robot.drive.follower.drivetrain.runDrive(drivePowers);
+        }
+    }
     public Command threeBallShootTeleOp() {
         return new SequentialCommandGroup(
+                new InstantCommand(this::autoAimAdjust),
+                new WaitCommand(1000),
                 new InstantCommand(() -> {
                     if (robot.limelightPoseEstimator.isValidTarget()) {
                         robot.shooterAdjust.setServos(
