@@ -22,13 +22,16 @@ public class FlywheelTuning extends OpMode {
     public ElapsedTime timer;
     public static double P, I, kV, kS;
     JoinedTelemetry joinedTelemetry = new JoinedTelemetry(PanelsTelemetry.INSTANCE.getFtcTelemetry(), telemetry);
+    private DcMotorEx motor2;
 
     @Override
     public void init() {
         //TODO: Set motor name and direction
         motor = hardwareMap.get(DcMotorEx.class, "motorS");
+        motor2 = hardwareMap.get(DcMotorEx.class, "motorS2");
         timer = new ElapsedTime();
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         controller = new PIDFControllerNew(getP(), getI(), 0.0, 0.0, timer);
     }
@@ -48,8 +51,9 @@ public class FlywheelTuning extends OpMode {
         joinedTelemetry.addData("Vel Error", getTargetVelocity() - velocity * 60 / 28);
         joinedTelemetry.addData("Time", 1.0 / timer.seconds());
         controller.setPIDF(getP(), getI(), 0.0, getKV());
-        velocity = motor.getVelocity();
+        velocity = (motor.getVelocity() + motor2.getVelocity()) / 2;
         motor.setPower(controller.calculate(getTargetVelocity() * 28 / 60, velocity));
+        motor2.setPower(controller.calculate(getTargetVelocity() * 28 / 60, velocity));
         joinedTelemetry.update();
 
 

@@ -13,6 +13,7 @@ import java.util.List;
 
 @Configurable
 public class LimelightPoseEstimator extends SubsystemBase {
+    private static final double LIMELIGHT_OFFSET = 6;
     private RobotHardware robot;
     public LLResult lastResult;
     public static double Kp;
@@ -23,7 +24,7 @@ public class LimelightPoseEstimator extends SubsystemBase {
     }
 
     // how many degrees back is your limelight rotated from perfectly vertical?
-    public double limelightMountAngleDegrees = 36.3477;
+    public double limelightMountAngleDegrees = 25.09033;
 
     // distance from the center of the Limelight lens to the floor
     public double limelightLensHeightInches = 10.0;
@@ -76,7 +77,8 @@ public class LimelightPoseEstimator extends SubsystemBase {
 
         //calculate distance
         double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
-        return distanceFromLimelightToGoalInches;
+        double distanceToFrontOfRobotToGoalInches = distanceFromLimelightToGoalInches - LIMELIGHT_OFFSET;
+        return distanceToFrontOfRobotToGoalInches;
     }
 
 }

@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
-import android.provider.Settings;
-
 import com.bylazar.telemetry.JoinedTelemetry;
 import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -12,12 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.hardware.motors.CRServoEx;
-import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
@@ -41,6 +36,7 @@ public class RobotHardware {
     public ElapsedTime timer;
     private double lastMeasuredVoltage;
     public LimelightPoseEstimator limelightPoseEstimator;
+    public DcMotorEx shooterMotor2;
 
     public static enum Alliance {
         BLUE,
@@ -101,7 +97,10 @@ public class RobotHardware {
 
         //shooter motor
         shooterMotor = map.get(DcMotorEx.class, "motorS");
+        shooterMotor2 = map.get(DcMotorEx.class, "motorS2");
+
         intakeMotor = new MotorEx(map, "motorI");
+        intakeMotor.setInverted(true);
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         shooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         servoLeft = new ServoEx(map, "servoLeft");
@@ -185,7 +184,7 @@ public class RobotHardware {
 //        }
 
         flightRecorder.addLine("========SHOOTER========");
-        flightRecorder.addData("Flywheel Target velocity", shooter.getVelocity());
+        flightRecorder.addData("Flywheel Target velocity", shooter.getTargetVelocity());
         flightRecorder.addData("Flywheel Current velocity", shooterMotor.getVelocity() * 60 / 28);
         flightRecorder.addData("Flywheel raw power output", shooterMotor.getPower());
         // show battery

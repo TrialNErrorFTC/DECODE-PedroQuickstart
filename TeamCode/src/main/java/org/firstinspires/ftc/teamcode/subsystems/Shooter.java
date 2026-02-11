@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
-import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -29,8 +27,8 @@ public class Shooter extends SubsystemBase {
     public static double targetRawPower = 0.0;
 
     public static double IDLE_VELOCITY = 0;
-    public static double kV = 0.00047;
-    public static double kP = 0.021;
+    public static double kV = 0.000582;
+    public static double kP = 0.01;
     public static double kI = 0.0;
     public static double kD = 0.0;
     public static double VELOCITY_TOLERANCE = 40.0;
@@ -123,8 +121,12 @@ public class Shooter extends SubsystemBase {
         targetVelocityRPM = velo;
     }
 
-    public double getVelocity() {
+    public double getTargetVelocity() {
         return targetVelocityRPM;
+    }
+
+    public double getCurrentVelocity() {
+        return (robot.shooterMotor.getVelocity() + robot.shooterMotor.getVelocity()) / 2;
     }
 
     public void setPower(double pow) {
@@ -144,7 +146,10 @@ public class Shooter extends SubsystemBase {
 
     private void velocityMode() {
         robot.shooterMotor.setPower(
-                flywheelVelocityPID.calculate(RPMtoVelo(targetVelocityRPM), robot.shooterMotor.getVelocity())
+                flywheelVelocityPID.calculate(RPMtoVelo(targetVelocityRPM), this.getCurrentVelocity())
+        );
+        robot.shooterMotor2.setPower(
+                flywheelVelocityPID.calculate(RPMtoVelo(targetVelocityRPM), this.getCurrentVelocity())
         );
     }
 

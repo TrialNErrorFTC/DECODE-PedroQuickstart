@@ -37,6 +37,6 @@ public class SetVelocityAndWait extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return shooter.getVelocity() - 50 < robot.shooterMotor.getVelocity() && robot.shooterMotor.getVelocity() < shooter.getVelocity() + 50;
+        return shooter.getTargetVelocity() - 50 < robot.shooterMotor.getVelocity() && robot.shooterMotor.getVelocity() < shooter.getTargetVelocity() + 50;
     }
 }
