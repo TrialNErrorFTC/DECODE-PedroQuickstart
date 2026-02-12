@@ -23,10 +23,10 @@ public class MecanumTeleDrive extends SubsystemBase {
     private double turnDirection;
 
     public MecanumTeleDrive(HardwareMap map) {
-        frontLeft = map.get(DcMotor.class, "motorFL");
-        frontRight = map.get(DcMotor.class, "motorFR");
-        backLeft = map.get(DcMotor.class, "motorBL");
-        backRight = map.get(DcMotor.class, "motorBR");
+        frontLeft = map.get(DcMotor.class, "frontLeftMotor");
+        frontRight = map.get(DcMotor.class, "frontRightMotor");
+        backLeft = map.get(DcMotor.class, "backLeftMotor");
+        backRight = map.get(DcMotor.class, "backRightMotor");
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -23,7 +23,7 @@ public class LimelightPoseEstimator extends SubsystemBase {
     }
 
     // how many degrees back is your limelight rotated from perfectly vertical?
-    public double limelightMountAngleDegrees = 36.3477;
+    public double limelightMountAngleDegrees = 25.3;
 
     // distance from the center of the Limelight lens to the floor
     public double limelightLensHeightInches = 10.0;
@@ -75,7 +75,7 @@ public class LimelightPoseEstimator extends SubsystemBase {
         double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
 
         //calculate distance
-        double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+        double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians) ;
         return distanceFromLimelightToGoalInches;
     }
 
