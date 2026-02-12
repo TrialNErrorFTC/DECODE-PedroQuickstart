@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.fork;
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.waitFor;
+import static org.firstinspires.ftc.teamcode.opmodes.DriveTeleOpBlue.Kp;
 
 import androidx.annotation.NonNull;
 
@@ -13,21 +14,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.LogCatCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
-import com.seattlesolvers.solverslib.command.ParallelRaceGroup;
-import com.seattlesolvers.solverslib.command.RepeatCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
-import com.seattlesolvers.solverslib.command.button.Button;
-import com.seattlesolvers.solverslib.command.button.GamepadButton;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
-import com.seattlesolvers.solverslib.pedroCommand.TurnToCommand;
 import com.seattlesolvers.solverslib.util.TelemetryData;
-
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
@@ -39,34 +30,49 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
  * It's responsible for initializing subsystems and mapping gamepad inputs to robot actions.
  */
 @Autonomous
-public class sixBallShoot extends CommandOpMode {
+public class nineBallShootNew extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);//Poses
     public static Pose startPose = new Pose(21.122235157159484, 123.54831199068684, Math.toRadians(140));
     public static Pose shootPose = new Pose(40.59022118742725, 102.10942956926658, Math.toRadians(140));
     public static Pose pickup1StartPose = new Pose(44.67520372526194, 90.23748544819556, Math.toRadians(180));
     public static Pose pickup1EndPose = new Pose(20.973806752037255, 90.23748544819556, Math.toRadians(180));
+    public static Pose pickup2StartPose = new Pose(44.67520372526194, 90.23748544819556, Math.toRadians(180));
+    public static Pose pickup2EndPose = new Pose(20.973806752037255, 90.23748544819556, Math.toRadians(180));
 
-    PathChain scorePreload, preloadToPickup1, startPickup1, endPickup1, shootPickup;
+    PathChain preloadToScore, scoreToPickup1Start, pickup1StartToPickup1End, pickup1EndToScore, scoreToPickup2Start, pickup2StartToPickup2End, pickup2EndToScore;
     private RobotHardware robot;
 
     public void buildPaths() {
-        scorePreload = follower.pathBuilder()
+        preloadToScore = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, shootPose))
                 .setConstantHeadingInterpolation(Math.toRadians(140))
                 .build();
-        preloadToPickup1 = follower.pathBuilder()
+        scoreToPickup1Start = follower.pathBuilder()
                 .addPath(new BezierLine(shootPose, pickup1StartPose))
                 .setConstantHeadingInterpolation(Math.toRadians(135))
                 .build();
-        startPickup1 = follower.pathBuilder()
+        pickup1StartToPickup1End = follower.pathBuilder()
                 .addPath(new BezierLine(pickup1StartPose, pickup1EndPose))
                 .setConstantHeadingInterpolation(pickup1StartPose.getHeading())
                 .build();
-        endPickup1 = follower.pathBuilder()
+        pickup1EndToScore = follower.pathBuilder()
                 .addPath(new BezierLine(pickup1EndPose, shootPose))
                 .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), shootPose.getHeading())
                 .build();
+        scoreToPickup2Start = follower.pathBuilder()
+                .addPath(new BezierLine(shootPose, pickup1StartPose))
+                .setConstantHeadingInterpolation(Math.toRadians(135))
+                .build();
+        pickup2StartToPickup2End = follower.pathBuilder()
+                .addPath(new BezierLine(pickup1StartPose, pickup1EndPose))
+                .setConstantHeadingInterpolation(pickup1StartPose.getHeading())
+                .build();
+        pickup2EndToScore = follower.pathBuilder()
+                .addPath(new BezierLine(pickup1EndPose, shootPose))
+                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), shootPose.getHeading())
+                .build();
+
     }
 
 
@@ -111,8 +117,16 @@ public class sixBallShoot extends CommandOpMode {
 
     }
 
+    public void autoAimAdjust() {
+        if (robot.limelight.getLatestResult() != null && robot.limelight.getLatestResult().isValid()) {
+            double drivePowers[] = {Kp * robot.limelight.getLatestResult().getTx(), Kp * robot.limelight.getLatestResult().getTx(), -Kp * robot.limelight.getLatestResult().getTx(), -Kp * robot.limelight.getLatestResult().getTx()};
+            robot.drive.follower.drivetrain.runDrive(drivePowers);
+        }
+    }
     public Command threeBallShootTeleOp() {
         return new SequentialCommandGroup(
+                new InstantCommand(this::autoAimAdjust),
+                new WaitCommand(1000),
                 new InstantCommand(() -> {
                     if (robot.limelightPoseEstimator.isValidTarget()) {
                         robot.shooterAdjust.setServos(
@@ -165,10 +179,10 @@ public class sixBallShoot extends CommandOpMode {
         m_offCommand.schedule();
 
         SequentialCommandGroup autoSequence = new SequentialCommandGroup(
-                new FollowPathCommand(follower, scorePreload, true, 0.7),
+                new FollowPathCommand(follower, preloadToScore, true, 0.7),
                 new WaitCommand(1000),
                 threeBallShootTeleOp(),
-                new FollowPathCommand(follower, preloadToPickup1, true, 0.7),
+                new FollowPathCommand(follower, scoreToPickup1Start, true, 0.7),
                 new WaitCommand(1000),
                 new ParallelCommandGroup(
                         new InstantCommand(() -> {
@@ -177,14 +191,14 @@ public class sixBallShoot extends CommandOpMode {
                         new InstantCommand((robot.transfer::transfer)
                         )),
                 new InstantCommand(() -> follower.setMaxPower(0.5)),
-                new FollowPathCommand(follower, startPickup1, true),
+                new FollowPathCommand(follower, pickup1StartToPickup1End, true),
                 new ParallelCommandGroup(
                         new InstantCommand(() -> {
                             robot.intake.setMode(Intake.Mode.OFF);
                         }),
                         new InstantCommand((robot.transfer::stop)
                         )),
-                new FollowPathCommand(follower, endPickup1, true),
+                new FollowPathCommand(follower, pickup1EndToScore, true),
                 threeBallShootTeleOp()
         );
         schedule(autoSequence);

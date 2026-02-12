@@ -42,7 +42,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 public class sixBallShootRed extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);//Poses
-    public static Pose startPose = new Pose(21.122235157159484, 123.54831199068684, Math.toRadians(140));
+    public static Pose startPose = new Pose(21.122235157159484, 123.54831199068684, Math    .toRadians(140));
     public static Pose shootPose = new Pose(40.59022118742725, 102.10942956926658, Math.toRadians(140));
     public static Pose pickup1StartPose = new Pose(44.67520372526194, 90.23748544819556, Math.toRadians(180));
     public static Pose pickup1EndPose = new Pose(20.973806752037255, 90.23748544819556, Math.toRadians(180));

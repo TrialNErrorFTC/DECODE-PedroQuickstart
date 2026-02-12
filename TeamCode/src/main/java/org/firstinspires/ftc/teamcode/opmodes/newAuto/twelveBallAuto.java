@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.opmodes.newAuto;
 
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.fork;
 import static org.firstinspires.ftc.teamcode.cmd.Commandlet.waitFor;
+import static org.firstinspires.ftc.teamcode.opmodes.DriveTeleOpBlue.Kp;
 
 import androidx.annotation.NonNull;
 
@@ -13,25 +14,19 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.LogCatCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
-import com.seattlesolvers.solverslib.command.ParallelRaceGroup;
-import com.seattlesolvers.solverslib.command.RepeatCommand;
 import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
-import com.seattlesolvers.solverslib.command.button.Button;
-import com.seattlesolvers.solverslib.command.button.GamepadButton;
-import com.seattlesolvers.solverslib.gamepad.GamepadEx;
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
-import com.seattlesolvers.solverslib.pedroCommand.TurnToCommand;
 import com.seattlesolvers.solverslib.util.TelemetryData;
 
-
+import org.firstinspires.ftc.teamcode.opmodes.newAuto.Paths;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.robot.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
+
+import java.util.Arrays;
 
 
 /**
@@ -39,37 +34,25 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
  * It's responsible for initializing subsystems and mapping gamepad inputs to robot actions.
  */
 @Autonomous
-public class sixBallShoot extends CommandOpMode {
+public class twelveBallAuto extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);//Poses
-    public static Pose startPose = new Pose(21.122235157159484, 123.54831199068684, Math.toRadians(140));
-    public static Pose shootPose = new Pose(40.59022118742725, 102.10942956926658, Math.toRadians(140));
-    public static Pose pickup1StartPose = new Pose(44.67520372526194, 90.23748544819556, Math.toRadians(180));
-    public static Pose pickup1EndPose = new Pose(20.973806752037255, 90.23748544819556, Math.toRadians(180));
+    public static Pose startPose = new Pose(122.87258687258688, 123.54831199068684, Math.toRadians(40));
+    public static Pose shootPose = new Pose(107.11969111969113, 106.05405405405405, Math.toRadians(40));
+    public static Pose pickup1StartPose = new Pose(106.05405405405405, 90.23748544819556, Math.toRadians(0));
+    public static Pose pickup1EndPose = new Pose(122.87258687258687, 90.23748544819556, Math.toRadians(0));
 
     PathChain scorePreload, preloadToPickup1, startPickup1, endPickup1, shootPickup;
     private RobotHardware robot;
+    private Paths paths;
+
 
     public void buildPaths() {
-        scorePreload = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, shootPose))
-                .setConstantHeadingInterpolation(Math.toRadians(140))
-                .build();
-        preloadToPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(shootPose, pickup1StartPose))
-                .setConstantHeadingInterpolation(Math.toRadians(135))
-                .build();
-        startPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1StartPose, pickup1EndPose))
-                .setConstantHeadingInterpolation(pickup1StartPose.getHeading())
-                .build();
-        endPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1EndPose, shootPose))
-                .setLinearHeadingInterpolation(pickup1EndPose.getHeading(), shootPose.getHeading())
-                .build();
+        paths = new Paths(follower);
     }
 
 
+    //set the shoot position and transfer
     @NonNull
     private SequentialCommandGroup getM_threeBallShoot2() {
         return new SequentialCommandGroup(
@@ -91,6 +74,7 @@ public class sixBallShoot extends CommandOpMode {
         );
     }
 
+    //set the actual three ball shoot
     public Command threeBallShoot() {
         return new SequentialCommandGroup(
                 new InstantCommand(robot.transfer::shoot_position),
@@ -111,8 +95,10 @@ public class sixBallShoot extends CommandOpMode {
 
     }
 
+    //take code from the three ball shoot teleop
     public Command threeBallShootTeleOp() {
         return new SequentialCommandGroup(
+//                new InstantCommand(this::autoAimAdjust),
                 new InstantCommand(() -> {
                     if (robot.limelightPoseEstimator.isValidTarget()) {
                         robot.shooterAdjust.setServos(
@@ -140,6 +126,10 @@ public class sixBallShoot extends CommandOpMode {
         );
     }
 
+//    public void autoAimAdjust() {
+//        double drivePowers[] = {Kp * robot.limelight.getLatestResult().getTx(), Kp * robot.limelight.getLatestResult().getTx(), -Kp * robot.limelight.getLatestResult().getTx(), -Kp * robot.limelight.getLatestResult().getTx()};
+//        robot.drive.follower.drivetrain.runDrive(drivePowers);
+//    }
     /**
      * This method is executed once when the OpMode is initialized.
      * It handles the setup of all necessary components for driver control,
@@ -151,7 +141,7 @@ public class sixBallShoot extends CommandOpMode {
 
         robot = RobotHardware.get();
         robot.init(hardwareMap, RobotHardware.Mode.TELEOP, telemetry, new Pose(72, 72, Math.toRadians(135)));
-        RobotHardware.alliance = RobotHardware.Alliance.BLUE;
+        RobotHardware.alliance = RobotHardware.Alliance.RED;
 
         // Initialize follower
         follower = Constants.createFollower(hardwareMap);
@@ -164,6 +154,11 @@ public class sixBallShoot extends CommandOpMode {
         m_initialize.schedule();
         m_offCommand.schedule();
 
+        SequentialCommandGroup autoTest = new SequentialCommandGroup(
+                new RunCommand(
+                        () -> {autoAimAdjust();}
+                ).withTimeout(5000)
+        );
         SequentialCommandGroup autoSequence = new SequentialCommandGroup(
                 new FollowPathCommand(follower, scorePreload, true, 0.7),
                 new WaitCommand(1000),

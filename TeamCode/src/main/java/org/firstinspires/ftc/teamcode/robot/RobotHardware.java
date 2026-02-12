@@ -136,6 +136,7 @@ public class RobotHardware {
 
         if (mode == Mode.AUTO) {
             drive = new MecanumDrive(map, pose);
+            teleDrive = new MecanumTeleDrive(map);
         } else if (mode == Mode.TELEOP) {
             teleDrive = new MecanumTeleDrive(map);
 //            drive = new MecanumDrive(map, pose);

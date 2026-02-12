@@ -39,10 +39,10 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
  * It's responsible for initializing subsystems and mapping gamepad inputs to robot actions.
  */
 @Autonomous
-public class sixBallShoot extends CommandOpMode {
+public class threeBallShootOpMode extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);//Poses
-    public static Pose startPose = new Pose(21.122235157159484, 123.54831199068684, Math.toRadians(140));
+    public static Pose startPose = new Pose(55.81467181467182, 7, Math.toRadians(90));
     public static Pose shootPose = new Pose(40.59022118742725, 102.10942956926658, Math.toRadians(140));
     public static Pose pickup1StartPose = new Pose(44.67520372526194, 90.23748544819556, Math.toRadians(180));
     public static Pose pickup1EndPose = new Pose(20.973806752037255, 90.23748544819556, Math.toRadians(180));
@@ -116,20 +116,14 @@ public class sixBallShoot extends CommandOpMode {
                 new InstantCommand(() -> {
                     if (robot.limelightPoseEstimator.isValidTarget()) {
                         robot.shooterAdjust.setServos(
-                                robot.shooterAdjust.goalDistanceToAngle(robot.limelightPoseEstimator.distanceToGoal())
+                                0
                         );
                     }
                 }),
                 new WaitCommand(300),
                 new InstantCommand(
                         () -> {
-                            if (robot.limelightPoseEstimator.isValidTarget()) {
-                                robot.shooter.setVelocity(
-                                        robot.shooter.goalDistanceToRPM(robot.limelightPoseEstimator.distanceToGoal())
-                                );
-                            } else {
-                                robot.shooter.setVelocity(2100);
-                            }
+                                robot.shooter.setVelocity(5000);
                         }
                 ),
                 new WaitCommand(3000),
@@ -165,26 +159,10 @@ public class sixBallShoot extends CommandOpMode {
         m_offCommand.schedule();
 
         SequentialCommandGroup autoSequence = new SequentialCommandGroup(
-                new FollowPathCommand(follower, scorePreload, true, 0.7),
+                new InstantCommand(
+                        () -> follower.drivetrain.runDrive(new double[]{0,0,0.3,0.3})
+                ),
                 new WaitCommand(1000),
-                threeBallShootTeleOp(),
-                new FollowPathCommand(follower, preloadToPickup1, true, 0.7),
-                new WaitCommand(1000),
-                new ParallelCommandGroup(
-                        new InstantCommand(() -> {
-                            robot.intake.setMode(Intake.Mode.INGEST);
-                        }),
-                        new InstantCommand((robot.transfer::transfer)
-                        )),
-                new InstantCommand(() -> follower.setMaxPower(0.5)),
-                new FollowPathCommand(follower, startPickup1, true),
-                new ParallelCommandGroup(
-                        new InstantCommand(() -> {
-                            robot.intake.setMode(Intake.Mode.OFF);
-                        }),
-                        new InstantCommand((robot.transfer::stop)
-                        )),
-                new FollowPathCommand(follower, endPickup1, true),
                 threeBallShootTeleOp()
         );
         schedule(autoSequence);
