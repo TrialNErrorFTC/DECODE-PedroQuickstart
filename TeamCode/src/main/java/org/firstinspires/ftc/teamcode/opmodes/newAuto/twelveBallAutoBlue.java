@@ -151,14 +151,15 @@ public class twelveBallAutoBlue extends CommandOpMode {
 
         robot = RobotHardware.get();
         robot.init(hardwareMap, RobotHardware.Mode.TELEOP, telemetry, new Pose(72, 72, Math.toRadians(135)));
-        RobotHardware.alliance = RobotHardware.Alliance.RED;
+        RobotHardware.alliance = RobotHardware.Alliance.BLUE;
 
         // Initialize follower
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(PathsBlue.P_START);
         buildPaths();
 
-
+        robot.limelight.pipelineSwitch(0);
+        
         InstantCommand m_initialize = new InstantCommand(robot.shooterAdjust::initializeServos);
         InstantCommand m_offCommand = new InstantCommand(robot.transfer::off_position);
         m_initialize.schedule();
