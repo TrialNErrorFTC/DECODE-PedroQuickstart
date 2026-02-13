@@ -112,8 +112,6 @@ public class RobotHardware {
                 .next();
 
         servoTransferShooter = new ServoEx(map, "servoTransfer");
-        servoTransferIntake = new CRServoEx(map, "servoTransfer2");
-        servoTransferIntake.setInverted(true);
         List<LynxModule> allHubs = map.getAll(LynxModule.class);
 
         limelight = map.get(Limelight3A.class, "limelight");

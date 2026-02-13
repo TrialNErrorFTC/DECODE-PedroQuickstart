@@ -9,6 +9,7 @@ import com.pedropathing.control.PIDFController;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
@@ -35,7 +36,8 @@ public class DriveTeleOpBlue extends OpMode {
     private enum DriveMode {
         LOCK,
         PARK,
-        DRIVE
+        DRIVE,
+        FIELD
     }
 
     private DriveMode currentDriveMode = DriveMode.DRIVE;
@@ -49,8 +51,6 @@ public class DriveTeleOpBlue extends OpMode {
         robot = RobotHardware.get();
         robot.init(hardwareMap, RobotHardware.Mode.TELEOP, telemetry, new Pose(72, 72, Math.toRadians(90)));
         RobotHardware.alliance = RobotHardware.Alliance.BLUE;
-        robot.limelight.pipelineSwitch(0);
-
         gamepad1Ex = new GamepadEx(gamepad1);
 
 //        controller = new PIDFController(robot.drive.follower.constants.coefficientsHeadingPIDF);
@@ -95,20 +95,20 @@ public class DriveTeleOpBlue extends OpMode {
 //        }), new InstantCommand());
 
 
-        Command intakeTransferOn = new ScheduleCommand(new InstantCommand(() -> {
-            robot.intake.setMode(Intake.Mode.INGEST);
-        }), new InstantCommand((robot.transfer::transfer)));
-
         Command intakeTransferOff = new ScheduleCommand(new InstantCommand(() -> {
             robot.intake.setMode(Intake.Mode.OFF);
-        }), new InstantCommand((robot.transfer::stop)));
+        }));
 
         Command intakeTransferReverse = new InstantCommand(() -> {
             robot.intake.setMode(Intake.Mode.DISCARD);
         });
 
-        bind(GamepadKeys.Button.RIGHT_BUMPER, intakeTransferOn, intakeTransferOff);
-
+        bind(GamepadKeys.Button.RIGHT_BUMPER, new InstantCommand(() -> {
+                    robot.intake.setMode(Intake.Mode.INGEST);
+                }), new InstantCommand(
+                        () -> robot.intake.setMode(Intake.Mode.OFF)
+                )
+        );
         bind(GamepadKeys.Button.LEFT_BUMPER, new InstantCommand(robot.transfer::shoot_position), new InstantCommand(robot.transfer::off_position));
 
         bind(GamepadKeys.Button.DPAD_UP, new InstantCommand(() -> {
@@ -185,6 +185,13 @@ public class DriveTeleOpBlue extends OpMode {
                 }
         ));
 
+        bindToggle(GamepadKeys.Button.LEFT_STICK_BUTTON, new InstantCommand(
+                () -> {
+                    currentDriveMode = DriveMode.FIELD;
+                }
+        ));
+
+
         bindToggle(GamepadKeys.Button.B, new InstantCommand(
                 () -> {
                     currentDriveMode = DriveMode.DRIVE;
@@ -210,6 +217,11 @@ public class DriveTeleOpBlue extends OpMode {
         robot.endLoop();
         double TURN_SPEED = 0.7;
         double DRIVE_SPEED = 0.8;
+        if (robot.limelightPoseEstimator.isValidTarget()) {
+            gamepad1.rumble(Gamepad.RUMBLE_DURATION_CONTINUOUS);
+        } else {
+            gamepad1.rumble(0);
+        }
         switch (currentDriveMode) {
             case LOCK:
                 robot.teleDrive.setTeleOpDrive(gamepad1Ex.getLeftY() * DRIVE_SPEED, gamepad1Ex.getLeftX() * DRIVE_SPEED, Kp * robot.limelight.getLatestResult().getTx());
@@ -220,6 +232,9 @@ public class DriveTeleOpBlue extends OpMode {
             case DRIVE:
                 robot.teleDrive.setTeleOpDrive(gamepad1Ex.getLeftY() * DRIVE_SPEED, gamepad1Ex.getLeftX() * DRIVE_SPEED, gamepad1Ex.getRightX() * TURN_SPEED);
                 break;
+//            case FIELD:
+//                robot.teleDrive.setTeleOpDriveField(gamepad1Ex.getLeftY() * DRIVE_SPEED, gamepad1Ex.getLeftX() * DRIVE_SPEED, gamepad1Ex.getRightX() * TURN_SPEED);
+//                break;
             default:
                 currentDriveMode = DriveMode.DRIVE;
                 break;

@@ -38,7 +38,7 @@ public class LimelightPoseEstimator extends SubsystemBase {
         robot = RobotHardware.get();
         robot.limelight.setPollRateHz(100);
         robot.limelight.start();
-        if (RobotHardware.alliance == RobotHardware.Alliance.BLUE) {
+        if (RobotHardware.alliance == RobotHardware.Alliance.RED) {
             robot.limelight.pipelineSwitch(0);
         } else {
             robot.limelight.pipelineSwitch(1);

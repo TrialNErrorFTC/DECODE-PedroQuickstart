@@ -34,7 +34,6 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
     public static PinpointConstants localizerConstants = new PinpointConstants()
             .forwardPodY(-8)
             .strafePodX(4)
@@ -43,6 +42,27 @@ public class Constants {
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
             .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD)
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+
+    /**
+     * These are the PathConstraints in order:
+     * tValueConstraint, velocityConstraint, translationalConstraint, headingConstraint, timeoutConstraint,
+     * brakingStrength, BEZIER_CURVE_SEARCH_LIMIT, brakingStart
+     * <p>
+     * The BEZIER_CURVE_SEARCH_LIMIT should typically be left at 10 and shouldn't be changed.
+     */
+
+    public static PathConstraints pathConstraints = new PathConstraints(
+            0.995,
+            0.1,
+            0.1,
+            0.009,
+            50,
+            1.25,
+            10,
+            1
+    );
+
+    //Add custom localizers or drivetrains here
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .pinpointLocalizer(localizerConstants)

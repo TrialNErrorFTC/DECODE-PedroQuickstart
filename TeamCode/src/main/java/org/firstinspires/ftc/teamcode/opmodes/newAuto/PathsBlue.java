@@ -6,7 +6,7 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 
-public class Paths {
+public class PathsBlue {
 
     private final Follower f;
 
@@ -41,52 +41,52 @@ public class Paths {
     // POSES (ALL CENTRALIZED)
     // =============================
 
-    public static Pose P_START = new Pose(112.094, 138.091);
-    public static Pose P_SHOOT = new Pose(89.000, 102.000);
+    public static Pose P_START = new Pose(144 - 112.094, 138.091, Math.toRadians(180));
+    public static Pose P_SHOOT = new Pose(144 - 89.000, 102.000);
 
     // Intake 3
-    public static Pose P_I3_CP = new Pose(79.512, 85.6);
-    public static Pose P_I3_END = new Pose(95.550, 85.6);
-    public static Pose P_I3_WALL = new Pose(123, 85.6);
+    public static Pose P_I3_CP = new Pose(144 - 79.512, 85.6);
+    public static Pose P_I3_END = new Pose(144 - 95.550, 85.6);
+    public static Pose P_I3_WALL = new Pose(144 - 123, 85.6);
 
     // Intake 6
-    public static Pose P_I6_CP = new Pose(73.435, 62.5);
-    public static Pose P_I6_END = new Pose(96.563, 62.5);
-    public static Pose P_I6_WALL = new Pose(129, 62.5);
+    public static Pose P_I6_CP = new Pose(144 - 73.435, 62.5);
+    public static Pose P_I6_END = new Pose(144 - 96.563, 62.5);
+    public static Pose P_I6_WALL = new Pose(144 - 129, 62.5);
 
     // Ramp
-    public static Pose P_RAMP_CP = new Pose(92.680, 75.123);
-    public static Pose P_RAMP_END = new Pose(127.8, 75);
+    public static Pose P_RAMP_CP = new Pose(144 - 92.680, 75.123);
+    public static Pose P_RAMP_END = new Pose(144 - 127.8, 75);
 
     // Intake 9
-    public static Pose P_I9_CP = new Pose(90, 39);
-    public static Pose P_I9_END = new Pose(99.264, 39);
-    public static Pose P_I9_WALL = new Pose(137, 39);
-    public static Pose P_I9_RETURN = new Pose(99.433, 39);
+    public static Pose P_I9_CP = new Pose(144 - 90, 39);
+    public static Pose P_I9_END = new Pose(144 - 99.264, 39);
+    public static Pose P_I9_WALL = new Pose(144 - 137, 39);
+    public static Pose P_I9_RETURN = new Pose(144 - 99.433, 39);
 
     // Extra balls
-    public static Pose P_HP_CP1 = new Pose(111.920, 56.783);
-    public static Pose P_HP_END = new Pose(137.788, 49.329);
-    public static Pose P_HP_WALL = new Pose(137.807, 6);
-    public static Pose P_HP_RETURN = new Pose(137.638, 49.348);
+    public static Pose P_HP_CP1 = new Pose(144 - 111.920, 56.783);
+    public static Pose P_HP_END = new Pose(144 - 137.788, 49.329);
+    public static Pose P_HP_WALL = new Pose(144 - 137.807, 6);
+    public static Pose P_HP_RETURN = new Pose(144 - 137.638, 49.348);
 
-    public static Pose P_EX_CP1 = new Pose(93.862, 66.851);
-    public static Pose P_EX_END1 = new Pose(133.027, 60.774);
+    public static Pose P_EX_CP1 = new Pose(144 - 93.862, 66.851);
+    public static Pose P_EX_END1 = new Pose(144 - 133.027, 60.774);
 
-    public static Pose P_EX_CP2 = new Pose(93.862, 66.682);
-    public static Pose P_EX_END2 = new Pose(133.027, 60.774);
+    public static Pose P_EX_CP2 = new Pose(144 - 93.862, 66.682);
+    public static Pose P_EX_END2 = new Pose(144 - 133.027, 60.774);
 
-    public static Pose P_EX_CP3 = new Pose(94.368, 66.513);
-    public static Pose P_EX_END3 = new Pose(133.027, 60.605);
+    public static Pose P_EX_CP3 = new Pose(144 - 94.368, 66.513);
+    public static Pose P_EX_END3 = new Pose(144 - 133.027, 60.605);
 
     // Leave
-    public static Pose P_LEAVE_END = new Pose(89.135, 80);
-    public static double H_38 = Math.toRadians(38);
-    public static double H_0 = Math.toRadians(0);
-    public static double H_43 = Math.toRadians(43);
+    public static Pose P_LEAVE_END = new Pose(144 - 89.135, 80);
+    public static double H_38 = Math.toRadians(180 - 38);
+    public static double H_0 = Math.toRadians(180);
+    public static double H_43 = Math.toRadians(180 - 43);
     public static double H_270 = Math.toRadians(270);
 
-    public Paths(Follower follower) {
+    public PathsBlue(Follower follower) {
         f = follower;
     }
 
@@ -139,7 +139,7 @@ public class Paths {
     }
 
     public Pose mirrorPose(Pose pose) {
-        return new Pose(144 - pose.getX(), pose.getY());
+        return new Pose(144 - 144 - pose.getX(), pose.getY());
     }
 
     // =============================
