@@ -159,7 +159,7 @@ public class twelveBallAutoBlue extends CommandOpMode {
         buildPaths();
 
         robot.limelight.pipelineSwitch(0);
-        
+
         InstantCommand m_initialize = new InstantCommand(robot.shooterAdjust::initializeServos);
         InstantCommand m_offCommand = new InstantCommand(robot.transfer::off_position);
         m_initialize.schedule();
